@@ -1,0 +1,179 @@
+---
+title: "Sus_en_cp_ucCsu_models"
+author: "Skylyn Irby"
+date: "7/18/2018"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(dplyr)
+library(stargazer)
+library(readxl)
+library(ggplot2)
+library(GGally)
+library(MASS)
+library(corpcor)
+library(mctest)
+library(ppcor)
+library(BBmisc)
+#Hlavac, Marek (2018). stargazer: Well-Formatted Regression and Summary Statistics Tables 
+#R package version 5.2.2. https://CRAN.R-project.org/package=stargazer 
+Sus_encp<- read.csv("Sus_en_cp_ucCsu_DEMO.csv", header = T)
+#Sus_encp$TotalSuspensions <- Sus_encp$Male.Suspensions + Sus_encp$Female.Suspensions
+Sus_encp <- Sus_encp[,-c(1,3,23)]
+#remove all NA's
+Sus_encp <- na.omit(Sus_encp)
+
+#------------------Standardizing and Normalizing Sus_encp Data------------
+dist_year <-as.character(Sus_encp$dist_year) 
+susvalues <- Sus_encp[,-c(1)] #identical df sans dist_year 
+# let's take off dist year, so this coonstant variable is not manipulated in anyway; we will append it after manipulating the variable values
+
+susvalues$AsianSuspensions <- as.numeric(as.character(susvalues$AsianSuspensions))
+susvalues$BlackSuspensions <- as.numeric(as.character(susvalues$BlackSuspensions))
+
+
+zsusvalues <- scale(susvalues, center = TRUE, scale = TRUE) # scaled data; standardized https://stat.ethz.ch/R-manual/R-devel/library/base/html/scale.html 
+nzsusvalues <- normalize(zsusvalues, method = 'range', range = c(0,1)) # norm data https://www.rdocumentation.org/packages/BBmisc/versions/1.10/topics/normalize
+
+susnormdf <- as.data.frame(nzsusvalues) # converting the standardized and normalized just values into a data frame 
+standnormSus_encp <- cbind(dist_year,susnormdf) # standardized data frame with all the values and dist_year (as "factor")
+write.csv(standnormSus_encp, file="/Users/skylynolyviairby/Desktop/Edu Data Suspension/standnormSus_encp.csv")
+
+#---------------Model 1 with Standardized Data-------------
+SusModel1Stand <- lm(ucCsu_total ~  TotalSuspensions + FreeReduced + Foster + EnglishLearner, data= standnormSus_encp)
+SusModel1Stand
+summary(SusModel1Stand)
+
+stargazer(SusModel1Stand, type="latex", 
+          dep.var.labels = c("UC/CSU Eligible Graduates"),covariate.labels = c("Suspensions","Free and Reduced Lunch" ,"Foster Youth","English Learners" ), single.row = T, report = ('vc*s*p'),out="modeloneNOCOLLIN.tex")
+
+#--------------Susp Model 1 Stand. Check for Colinearity-------------------
+Mod1stand<- standnormSus_encp[,c(9:11,20,23)] #check for colinearity from the stand. data frame
+ggpairs(Mod1stand)
+
+cor2pcor(cov(Mod1stand))
+
+# now, Farrar – Glauber Test
+omcdiag(x= Mod1stand, y=standnormSus_encp$ucCsu_total)
+
+imcdiag(Mod1stand,standnormSus_encp$ucCsu_total)
+
+# Now, we're going to conduct a t-test for correlation coefficient 
+pcor(Mod1stand, method = "pearson")
+
+#-------------MODEL 1 Remove FreeReduced after Colinearity-------------
+SusModel11 <- lm(ucCsu_total ~ TotalSuspensions + Foster + EnglishLearner, data=standnormSus_encp)
+SusModel11
+summary(SusModel11)
+
+stargazer(SusModel11, type="latex", 
+          dep.var.labels = c("UC/CSU Eligible Graduates"),covariate.labels = c("Suspensions","Foster Youth","English Learners" ), single.row = T, report = ('vc*p*s'),out="modeloneNOCOLLIN.tex")
+#---------------MODEL 1---Removed English Learners after colinearity-------------
+SusModel111 <- lm(ucCsu_total ~ TotalSuspensions + Foster + FreeReduced, data=standnormSus_encp)
+SusModel111
+summary(SusModel111)
+stargazer(SusModel111, type="latex", 
+          dep.var.labels = c("UC/CSU Eligible Graduates"),covariate.labels = c("Suspensions","Foster Youth","Free and Reduced Lunch"), single.row = T, report = ('vc*p*s'),out="modeloneNOCOLLIN.tex")
+
+```
+
+```{r}
+# ---------------- Standardizing data for Model 2--------------------
+Sus_encp2 <- Sus_encp[,-c(1,12:18)] # removing the Uc/Csu demograhic variables because they are the dependent variable
+
+# Make every column numeric that is not already 
+Sus_encp2$AsianSuspensions <- as.numeric(as.character(Sus_encp2$AsianSuspensions))
+Sus_encp2$BlackSuspensions <- as.numeric(as.character(Sus_encp2$BlackSuspensions))
+
+zsus2values <- scale(Sus_encp2, center = TRUE, scale = TRUE) # scaled data; standardized https://stat.ethz.ch/R-manual/R-devel/library/base/html/scale.html 
+nzsus2values <- normalize(zsus2values, method = 'range', range = c(0,1)) # norm data https://www.rdocumentation.org/packages/BBmisc/versions/1.10/topics/normalize
+
+susnormdf2 <- as.data.frame(nzsus2values) # converting the standardized and normalized just values into a data frame 
+standnormSus_encp2 <- cbind(dist_year,susnormdf2) # data frame with all the values and dist_year (as "factor")
+write.csv(standnormSus_encp2, file="/Users/skylynolyviairby/Desktop/Edu Data Suspension/standnormSus_encp2.csv")
+
+#------------------Model 2 Standardized-----------------
+
+standnormSus_encp2 <- standnormSus_encp2[,-c(1)] #get rid of dist_year
+AllColPredictorModel2Stand <- lm(ucCsu_total~., standnormSus_encp2, na.action=na.exclude)
+AllColPredictorModel2Stand
+summary(AllColPredictorModel2Stand)
+
+stargazer(AllColPredictorModel2Stand, type="latex", dep.var.labels = c("UC/CSU Eligible Graduates"), covariate.labels = c("Enrolled (Asian)", "Enrolled (Black)","Enrolled (Hispanic)","Enrolled (White)","Enrolled (Other)", "Enrolled (Female)","Enrolled (Male)","English Learners","Free or Reduced Lunch","Foster Youth","Enrolled","Suspensions (Male)","Suspensions (Female)","Suspensions (Asian)","Suspensions (Black)","Suspensions (Hispanic)","Suspensions (White)","OtherSuspensions", "Suspenions"),report = ('vc*p*s'), out="modeltwo.tex")
+
+
+#-------------------Model 2 Check for colinearity but didn-----------------
+Mod2stand<- standnormSus_encp2[,c(1:11, 13:20)] #check for colinearity from the stand. data frame
+ggpairs(Mod2stand)
+
+cor2pcor(cov(Mod2stand))
+
+# now, Farrar – Glauber Test
+omcdiag(x= Mod2stand, y=standnormSus_encp2$ucCsu_total)
+
+imcdiag(Mod2stand,standnormSus_encp2$ucCsu_total)
+
+# Now, we're going to conduct a t-test for correlation coefficient 
+pcor(Mod2stand, method = "pearson")
+
+#-------------------Model 2 for Ethnicities---------------------------
+SusModel2Eth <- lm(ucCsu_total~  EnglishLearner + FreeReduced + Foster + AsianSuspensions + BlackSuspensions + HispanicSuspensions + WhiteSuspensions + OtherSuspensions, standnormSus_encp2)
+SusModel2Eth
+summary(SusModel2Eth)
+
+stargazer(SusModel2Eth, type="latex", dep.var.labels = c("UC/CSU Eligible Graduates"), covariate.labels = c("English Learners","Free or Reduced Lunch","Foster Youth","Suspensions (Asian)","Suspensions (Black)","Suspensions (Hispanic)","Suspensions (White)","OtherSuspensions"),report = ('vc*p*s'), out="modeltwo.tex")
+
+#may need to check for colinearity
+# Mod2standEthn<- standnormSus_encp2[,c(1:5, 8:10, 16:20)] #check for colinearity from the stand. data frame
+# ggpairs(Mod2stand)
+# 
+# cor2pcor(cov(Mod2stand))
+# 
+# # now, Farrar – Glauber Test
+# omcdiag(x= Mod2stand, y=standnormSus_encp2$ucCsu_total)
+# 
+# imcdiag(Mod2stand,standnormSus_encp2$ucCsu_total)
+# 
+# # Now, we're going to conduct a t-test for correlation coefficient 
+# pcor(Mod2stand, method = "pearson")
+
+
+#-----------------Model 2 for Gender---------------------------
+SusModel2Gen<- lm(ucCsu_total~  EnglishLearner + FreeReduced + Foster + MaleSuspensions + FemaleSuspensions, data = standnormSus_encp2)
+SusModel2Gen
+summary(SusModel2Gen)
+
+stargazer(SusModel2Gen, type="latex", dep.var.labels = c("UC/CSU Eligible Graduates"), covariate.labels = c("English Learners","Free or Reduced Lunch","Foster Youth","Suspensions (Male)","Suspensions (Female)"),report = ('vc*p*s'), out="modeltwo.tex")
+```
+
+```{r}
+#-----------------Models using Relative DF------------
+relativeSDF <- read.csv(file="relativeCompleteMerge.csv", header = T)
+
+#------------------------Relative Suspension Model 1---------------------
+relativeSus1 <- lm(ucCsu_totalrel ~  TotalSuspensionsrel + EnglishLearnerrel + Fosterrel, data= relativeSDF)
+relativeSus1
+summary(relativeSus1)
+#R^2 = .165
+stargazer(relativeSus1, type="latex", dep.var.labels = c("UC/CSU Eligible Graduates"), covariate.labels = c("Suspensions","English Learners","Foster Youth"),report = ('vc*p*s'), out="modeltwo.tex")
+
+#------------------Relative Suspension Model 1: Ehtnicity------------
+relativeSusEth<- lm(ucCsu_totalrel~ AsianSuspensionrel + BlackSuspensionsrel + HispanicSuspensionsrel + WhiteSuspensionsrel + OtherSuspensionsrel  + EnglishLearnerrel + Fosterrel, data = relativeSDF)
+relativeSusEth
+summary(relativeSusEth)
+#R^2 = .22
+
+stargazer(relativeSusEth, type="latex", dep.var.labels = c("UC/CSU Eligible Graduates"), covariate.labels = c("Suspensions (Asian)","Suspensions (Black)", "Suspensions (Hispanic)", "Suspensions (White)", "Suspensions (Other)","English Learners","Foster Youth"),report = ('vc*p*s'), out="modeltwo.tex")
+
+#----------------Relative Suspension Model 1: Gender---------------------
+relativeSusGen <- lm(ucCsu_totalrel~  MaleSuspensionsrel + FemaleSuspensionsrel  + EnglishLearnerrel + Fosterrel, data = relativeSDF)
+relativeSusGen
+summary(relativeSusGen)
+#R^2 = .16
+stargazer(relativeSusGen, type="latex", dep.var.labels = c("UC/CSU Eligible Graduates"), covariate.labels = c("Suspensions (Male)", "Suspensions (Female)","English Learners","Foster Youth"),report = ('vc*p*s'), out="modeltwo.tex")
+
+```
+

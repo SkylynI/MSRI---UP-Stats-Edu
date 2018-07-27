@@ -1,0 +1,51 @@
+---
+title: "RemergeExpulsion"
+author: "Skylyn Irby"
+date: "7/23/2018"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library("dplyr")
+library(reshape2)
+library(reshape)
+#import suspension 
+ExpulsionData <- read.csv(file = "Combined_Expulsions.csv", header =T)
+
+Exp_Gender <- ExpulsionData[(ExpulsionData$reportingcategory=="GM" | ExpulsionData$reportingcategory=="GF" | ExpulsionData$reportingcategory=="TA" ) & ExpulsionData$aggregatelevel =="D1",]
+
+Exp_Gender <- Exp_Gender[,c(1,4,10,12)]
+
+Exp_Gender$reportingcategory <- as.character(Exp_Gender$reportingcategory)
+Exp_Gender$totalexpulsions <- as.numeric(as.character(Exp_Gender$totalexpulsions))
+
+#newdata <- aggregate(totalexpulsions~districtcode+ïacademicyear+reportingcategory, data= Exp_Gender, sum)
+Exp_Gender <- cast(Exp_Gender, academicyear + districtcode ~ reportingcategory, sum)
+
+```
+
+```{r}
+
+Exp_Ethnicity <- ExpulsionData[(ExpulsionData$reportingcategory=="RA" | ExpulsionData$reportingcategory=="RB" |ExpulsionData$reportingcategory=="RH" | ExpulsionData$reportingcategory=="RW" | ExpulsionData$reportingcategory=="RI"|ExpulsionData$reportingcategory=="RD" | ExpulsionData$reportingcategory=="RF" | ExpulsionData$reportingcategory=="RP" | ExpulsionData$reportingcategory=="RT") & ExpulsionData$aggregatelevel =="D1",]
+
+Exp_Ethnicity$reportingcategory <- as.character(Exp_Ethnicity$reportingcategory)
+Exp_Ethnicity$totalexpulsions <- as.numeric(as.character(Exp_Ethnicity$totalexpulsions))
+
+#only want year, district code, reporting category, and total suspensions
+Exp_Ethnicity <- Exp_Ethnicity[,c(1,4,10,12)]
+Exp_Ethnicity <- cast(Exp_Ethnicity, academicyear + districtcode ~ reportingcategory, sum)
+
+Exp_Ethnicity$Other <- rowSums(Exp_Ethnicity[,c("RI", "RD", "RF", "RP", "RT")])
+Exp_Ethnicity <- Exp_Ethnicity[,-c(5,6,8:10)]
+
+Expulsion_DEMO <- merge(Exp_Gender, Exp_Ethnicity, by = c("academicyear", "districtcode"))
+
+Expulsion_DEMO$dist_year <- paste( Expulsion_DEMO$districtcode, Expulsion_DEMO$academicyear, sep = "_")
+
+Expulsion_DEMO <- Expulsion_DEMO[,c(11,3:10)]
+colnames(Expulsion_DEMO) <- c("dist_year", "Expulsion_Female", "Expulsion_Male","Expulsion_Total", "Expulsion_Asian", "Expulsion_Black", "Expulsion_Hispanic", "Expulsion_White", "Expulsion_Other")
+
+write.csv(Expulsion_DEMO, file = "/Users/skylynolyviairby/Desktop/Edu Data Suspension/Expulsion_DEMO.csv")
+```

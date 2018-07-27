@@ -1,0 +1,137 @@
+---
+title: "Remerge4_expulsion_suspension"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library("dplyr")
+library(reshape2)
+#import suspension 
+SuspensionData <- read.csv(file = "SuspensionCombined.csv", header = T)
+
+Sus_Gender <- SuspensionData[(SuspensionData$reportingcategory=="GM" | SuspensionData$reportingcategory=="GF"|SuspensionData$reportingcategory=="TA") & SuspensionData$aggregatelevel =="D1",]
+
+Sus_Gender <- Sus_Gender[,c(2,5,11,13)]
+
+Sus_Gender$reportingcategory <- as.character(Sus_Gender$reportingcategory)
+Sus_Gender$totalsuspensions <- as.numeric(as.character(Sus_Gender$totalsuspensions))
+
+
+#newdata <- aggregate(totalsuspensions~districtcode+ïacademicyear+reportingcategory, data= Sus_Gender, sum)
+Sus_Gender <- cast(Sus_Gender, ïacademicyear + districtcode ~ reportingcategory, sum)
+
+```
+
+```{r}
+
+Sus_Ethnicity <- SuspensionData[(SuspensionData$reportingcategory=="RA" | SuspensionData$reportingcategory=="RB" |SuspensionData$reportingcategory=="RH" | SuspensionData$reportingcategory=="RW" | SuspensionData$reportingcategory=="RI"|SuspensionData$reportingcategory=="RD" | SuspensionData$reportingcategory=="RF" | SuspensionData$reportingcategory=="RP" | SuspensionData$reportingcategory=="RT" ) & SuspensionData$aggregatelevel =="D1",]
+
+Sus_Ethnicity$reportingcategory <- as.character(Sus_Ethnicity$reportingcategory)
+Sus_Ethnicity$totalsuspensions <- as.numeric(as.character(Sus_Ethnicity$totalsuspensions))
+
+#only want year, district code, reporting category, and total suspensions
+Sus_Ethnicity <- Sus_Ethnicity[,c(2,5,11,13)]
+Sus_Ethnicity <- cast(Sus_Ethnicity, ïacademicyear + districtcode ~ reportingcategory, sum)
+
+Sus_Ethnicity$Other <- rowSums(Sus_Ethnicity[,c("RI", "RD", "RF", "RP", "RT")])
+Sus_Ethnicity <- Sus_Ethnicity[,-c(5,6,8:10)]
+
+Suspension_DEMO <- merge(Sus_Gender, Sus_Ethnicity, by = c("ïacademicyear", "districtcode"))
+
+Suspension_DEMO$dist_year <- paste( Suspension_DEMO$districtcode, Suspension_DEMO$ïacademicyear, sep = "_")
+
+Suspension_DEMO <- Suspension_DEMO[,c(11,3:10)]
+colnames(Suspension_DEMO) <- c("dist_year", "FemaleSuspensions", "MaleSuspensions","TotalSuspensions","AsianSuspensions", "BlackSuspensions", "HispanicSuspensions", "WhiteSuspensions", "OtherSuspensions")
+
+write.csv(Suspension_DEMO, file = "/Users/skylynolyviairby/Desktop/Edu Data Suspension/Suspension_DEMO.csv")
+
+# Susmalesub <- Susmale[,c(2,5,11,13)]
+# Susfemalesub <- Susfemale[,c(2,5,11,13)]
+# 
+# gmfmerge <- merge(Susmalesub, Susfemalesub, by = c("ïacademicyear", "districtcode"))
+# gmfmerge <- gmfmerge[,-c(3,5)]
+# names(gmfmerge) <- c("Year", "DistrictCode", "MaleSuspensions", "FemaleSuspensions")
+# gmfmerge$dist_year <- paste( gmfmerge$DistrictCode, gmfmerge$Year, sep = "_")
+# gmfmerge <- gmfmerge[,-c(1,2)]
+# gmfmerge <- gmfmerge[,c(3,1,2)]
+# # The following code removes all '*' by forcing them into NAs and then the NAs are removed from the dataset.
+# gmfmerge_test <- gmfmerge
+# gmfmerge_test$MaleSuspensions <- as.numeric(as.character(gmfmerge_test$MaleSuspensions))
+# gmfmerge_test$FemaleSuspensions <- as.numeric(as.character(gmfmerge_test$FemaleSuspensions))
+# gmfmerge_rev <- na.omit(gmfmerge_test) # this results in 6005 rows (drops only 165 rows from the original merged dataset)
+# filterRA <- filter(SuspensionData,SuspensionData$aggregatelevel =="D1"& SuspensionData$reportingcategory=="RA")
+# filterRB <- filter(SuspensionData,SuspensionData$aggregatelevel =="D1"& SuspensionData$reportingcategory=="RB")
+# filterRH <- filter(SuspensionData,SuspensionData$aggregatelevel =="D1"& SuspensionData$reportingcategory=="RH")
+# filterRW <- filter(SuspensionData,SuspensionData$aggregatelevel =="D1"& SuspensionData$reportingcategory=="RW")
+# 
+# filterRI <- filter(SuspensionData,SuspensionData$aggregatelevel =="D1"& SuspensionData$reportingcategory=="RI")
+# filterRD <- filter(SuspensionData,SuspensionData$aggregatelevel =="D1"& SuspensionData$reportingcategory=="RD")
+# filterRF <- filter(SuspensionData,SuspensionData$aggregatelevel =="D1"& SuspensionData$reportingcategory=="RF")
+# filterRP <- filter(SuspensionData,SuspensionData$aggregatelevel =="D1"& SuspensionData$reportingcategory=="RP")
+# filterRT <- filter(SuspensionData,SuspensionData$aggregatelevel =="D1"& SuspensionData$reportingcategory=="RT")
+# 
+# filterRAsub <- filterRA[,c(2,5,13)]
+# names(filterRAsub) <- c("Year", "DistrictCode", "AsianSuspensions") 
+# filterRBsub <- filterRB[,c(2,5,13)]
+# names(filterRBsub) <- c("Year", "DistrictCode", "BlackSuspensions")
+# filterRHsub <- filterRH[,c(2,5,13)]
+# names(filterRHsub) <- c("Year", "DistrictCode", "HispanicSuspensions")
+# filterRWsub <- filterRW[,c(2,5,13)]
+# names(filterRWsub) <- c("Year", "DistrictCode", "WhiteSuspensions")
+# 
+# filterRIsub <- filterRI[,c(2,5,13)]
+# names(filterRIsub) <- c("Year", "DistrictCode", "Other1")
+# filterRDsub <- filterRD[,c(2,5,13)]
+# names(filterRDsub) <- c("Year", "DistrictCode", "Other2")
+# filterRFsub <- filterRF[,c(2,5,13)]
+# names(filterRFsub) <- c("Year", "DistrictCode", "Other3")
+# filterRPsub <- filterRP[,c(2,5,13)]
+# names(filterRPsub) <- c("Year", "DistrictCode", "Other4")
+# filterRTsub <- filterRT[,c(2,5,13)]
+# names(filterRTsub) <- c("Year", "DistrictCode", "Other5")
+
+# merge1 <- merge(filterRIsub, filterRDsub, by = c("Year", "DistrictCode"))
+# merge2 <- merge(merge1, filterRFsub, by = c("Year", "DistrictCode"))
+# merge3 <- merge(merge2, filterRPsub, by = c("Year", "DistrictCode"))
+# merge4 <- merge(merge3, filterRTsub,by = c("Year", "DistrictCode"))
+# 
+# 
+# 
+# # code to change '*' to NAs and then omit NAs
+# test <- merge4
+# test$Other1 <- as.numeric(as.character(test$Other1))
+# test$Other2 <- as.numeric(as.character(test$Other2))
+# test$Other3 <- as.numeric(as.character(test$Other3))
+# test$Other4 <- as.numeric(as.character(test$Other4))
+# test$Other5 <- as.numeric(as.character(test$Other5))
+# mbmerge <- na.omit(test) # this results in 1424 rows 
+# 
+# mbmerge$OtherMerge <- rowSums(mbmerge[,c("Other1", "Other2", "Other3", "Other4", "Other5")])
+# mbmerge <- mbmerge[,-c(3:7)]
+# #-----add the rest of the ethnicities
+# mergethn1k<- merge(filterRAsub, filterRBsub, by= c("Year", "DistrictCode"))
+# mergethn2k <- merge(mergethn1k, filterRHsub,by= c("Year", "DistrictCode"))
+# mergethn3k <- merge(mergethn2k, filterRWsub, by= c("Year", "DistrictCode"))
+# 
+# mergethn3k$AsianSuspensions <- as.integer(as.character(mergethn3k$AsianSuspensions))
+# mergethn3k$AsianSuspensions[is.na(mergethn3k$AsianSuspensions)] 
+# 
+# mergethn3k$BlackSuspensions <- as.integer(as.character(mergethn3k,$BlackSuspensions))
+# mergethn3k$BlackSuspensions[is.na(mergethn3k$BlackSuspensions)] 
+# 
+# mergethn3k$HispanicSuspensions <- as.integer(as.character(mergethn3k$HispancisSuspensions))
+# mergethn3k$HispanicSuspensions[is.na(mergethn3k$HispanicSuspensions)] 
+# 
+# mergethn3k$WhiteSuspensions <- as.integer(as.character(mergethn3k$WhiteSuspensions))
+# mergethn3k$WhiteSuspensions[is.na(mergethn3k$WhiteSuspensions)] 
+# 
+# mergeOk <- merge(mbmerge, mergethn3k, by= c("Year", "DistrictCode"))
+# 
+# mergeO$dist_year <- paste( mergeO$DistrictCode, mergeO$Year, sep = "_")
+# mergeO <- mergeO[,c(8,3:7)]
+# Suspension_demo <- merge(gmfmerge, mergeO, by= c("dist_year"))
+
+```
+

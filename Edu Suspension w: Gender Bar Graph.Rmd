@@ -1,0 +1,858 @@
+---
+title: "Edu data"
+author: "Skylyn Irby"
+date: "7/3/2018"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+2011-2012
+
+
+```{r}
+library("dplyr")
+Suspension11 <- read.csv("suspension2011-12.csv", header = T)
+
+
+# Col 1 - Schools 
+length(unique(Suspension11$districtcode))
+# Finding how many unique elements are in the column districtcode- returns 
+length((Suspension11$districtcode)) # checking the length of the original column 
+
+length(unique(Suspension11$schoolcode))
+#now we do the same for all 20 columns  
+length(unique(Suspension11$countycode))
+
+# Col 2 - ethnicities 
+length(unique(Suspension11$reportingcategory)) # returns 9 
+
+# Col 3 - gender 
+#length(unique(elevendata$GENDER)) # 2 
+
+#sum(Suspension1$V10 
+sum(as.numeric(Suspension11$cumulativeenrollment)) 
+sum(as.numeric(Suspension11$totalsuspensions))
+sum(as.numeric(Suspension11$unduplicatedcountofstudentssuspe)) 
+sum(as.numeric(Suspension11$V14)) 
+sum(as.numeric(Suspension11$suspensionratetotal)) 
+sum(as.numeric(Suspension11$suspensioncountviolentincidentin)) 
+sum(as.numeric(Suspension11$suspensioncountviolentincidentno)) 
+s <- sum(as.numeric(Suspension11$suspensioncountweaponspossession)) 
+a <- sum(as.numeric(Suspension11$suspensioncountillicitdrugrelate))  
+sum(as.numeric(Suspension11$suspensioncountofstudentssuspend))  
+sum(as.numeric(Suspension11$suspensioncountotherreasons))  
+sum(as.numeric(Suspension11$errataflagyn))
+
+#extracts male suspension
+GMcol11<- which(Suspension11[,10] == "GM")
+length(GMcol11)
+GMcolrow11 <- Suspension11[GMcol11,]
+
+#extracts female suspension
+GFcol11= which(Suspension11[,10] == "GF")
+length(GFcol11)
+GFcolrow11 <- Suspension11[GFcol11,]
+
+#extracts Black suspension
+RBcol= which(Suspension11[,10] == "RB")
+length(RBcol)
+RBcolrow <- Suspension11[RBcol,]
+
+#Extracts American Indian or Alaska Native
+RIcol= which(Suspension11[,10] == "RI")
+length(RIcol)
+RIcolrow <- Suspension11[RIcol,]
+
+
+#Extracts  Asian suspension
+RAcol= which(Suspension11[,10] == "RA")
+length(RAcol)
+RAcolrow <- Suspension11[RAcol,]
+
+#Extracts Filipino suspension
+RFcol= which(Suspension11[,10] == "RF")
+length(RFcol)
+RFcolrow <- Suspension11[RFcol,]
+
+#Extracts Hispanic/Latino
+RHcol= which(Suspension11[,10] == "RH")
+length(RHcol)
+RHcolrow <- Suspension11[RHcol,]
+
+#Extracts Not reported
+RDcol= which(Suspension11[,10] == "RD")
+length(RDcol)
+RDcolrow <- Suspension11[RDcol,]
+
+#Pacific Islanders
+RPcol= which(Suspension11[,10] == "RP")
+length(RPcol)
+RPcolrow <- Suspension11[RPcol,]
+
+#Extracts 2+ races (mixed)
+RTcol= which(Suspension11[,10] == "RT")
+length(RTcol)
+RTcolrow <- Suspension11[RTcol,]
+
+#Extracts white
+RWcol= which(Suspension11[,10] == "RW")
+length(RWcol)
+RWcolrow <- Suspension11[RWcol,]
+
+#Extracts English Learners
+SEcol= which(Suspension11[,10] == "SE")
+length(SEcol)
+SEcolrow <- Suspension11[SEcol,]
+
+#Extracts the rows of Totals for each county; TA stands for Total Suspensions
+
+county_TAcount11 <- filter(Suspension11, Suspension11$reportingcategory =="TA")
+
+
+TAcounty11 <- county_TAcount11[c(2:59),c(1,6,10,12)]
+TAcounty11
+
+```
+
+```{r}
+county_GMcount11 <- filter(Suspension11, Suspension11$reportingcategory =="GM")
+
+county_GFcount11 <- filter(Suspension11, Suspension11$reportingcategory =="GF")
+
+#county_count <- filter(Suspension11, Suspension11$reportingcategory =="TA" && Suspension11$aggregatelevel == "c" && Suspension11$totalsuspensions)
+
+
+GMcounty11 <- county_GMcount11[c(2:59), c(1,6,10,12)]
+GMcounty11
+
+SuspensionMales11 <- sum(as.numeric(as.character(GMcounty11$totalsuspensions)))
+SuspensionMales11
+
+GFcounty11 <- county_GFcount11[c(2:59), c(1,6,10,12)]
+GFcounty11
+
+SuspensionFemales11 <- sum(as.numeric(as.character(GFcounty11$totalsuspensions)))
+SuspensionFemales11
+```
+
+```{r}
+
+
+datframeTA <- data.frame(county_TAcount[, "countyname"], onlyTAcounty)
+datframeTA
+
+datframeGM <- data.frame(county_GMcount[c(2:59), "countyname"], onlyGMcounty)
+datframeGM
+
+datframeGF <- data.frame(county_GFcount[c(2:59), "countyname"], onlyGFcounty)
+datframeGF
+
+#clean data for males
+datframenew <- datframeGM[,c(1,4)]
+colnames(datframenew) <- c("county", "Total")
+datframenew$gender <- "Males"
+
+#clean for females
+datframe2 <- datframeGF[,c(1,4)]
+colnames(datframe2) <- c("county", "Total")
+datframe2$gender <- "Females"
+
+#combined dataframes
+combined <- rbind(datframenew, datframe2)
+#datframe <- data.frame(x = county_count[c(2:59),],  y = GMcolrow, z = county_count)
+#datframe
+
+
+```
+
+2012-2013
+```{r}
+Suspension12 <- read.csv("suspension2012-13.csv", header = T)
+
+
+# Col 1 - Schools 
+length(unique(Suspension12$districtcode))
+# Finding how many unique elements are in the column districtcode- returns 
+length((Suspension12$districtcode)) # checking the length of the original column 
+
+length(unique(Suspension12$schoolcode))
+#now we do the same for all 20 columns  
+
+# Col 2 - ethnicities 
+length(unique(Suspension12$reportingcategory)) # returns 9 
+
+# Col 3 - gender 
+#length(unique(elevendata$GENDER)) # 2 
+
+#sum(Suspension1$V10 
+sum(as.numeric(Suspension12$cumulativeenrollment)) 
+sum(as.numeric(Suspension12$totalsuspensions))
+sum(as.numeric(Suspension12$unduplicatedcountofstudentssuspe)) 
+sum(as.numeric(Suspension12$V14)) 
+sum(as.numeric(Suspension12$suspensionratetotal)) 
+sum(as.numeric(Suspension12$suspensioncountviolentincidentin)) 
+sum(as.numeric(Suspension12$suspensioncountviolentincidentno)) 
+t <- sum(as.numeric(Suspension12$suspensioncountweaponspossession)) 
+b <- sum(as.numeric(Suspension12$suspensioncountillicitdrugrelate))  
+sum(as.numeric(Suspension12$suspensioncountofstudentssuspend))  
+sum(as.numeric(Suspension12$suspensioncountotherreasons))  
+sum(as.numeric(Suspension12$errataflagyn))
+
+#extracts male suspension
+GMcol2<- which(Suspension12[,10] == "GM")
+length(GMcol2)
+GMcolrow2 <- Suspension12[GMcol2,]
+
+#extracts female suspension
+GFcol2= which(Suspension12[,10] == "GF")
+length(GFcol2)
+GFcolrow2 <- Suspension12[GFcol2,]
+```
+
+```{r}
+
+county_GMcount12 <- filter(Suspension12, Suspension12$reportingcategory =="GM")
+
+county_GFcount12 <- filter(Suspension12, Suspension12$reportingcategory =="GF")
+
+#county_count <- filter(Suspension11, Suspension11$reportingcategory =="TA" && Suspension11$aggregatelevel == "c" && Suspension11$totalsuspensions)
+
+GMcounty12 <- county_GMcount12[c(2:59), c(1,6,10,12)]
+GMcounty12
+
+SuspensionMales12 <- sum(as.numeric(as.character(GMcounty12$totalsuspensions)))
+SuspensionMales12
+
+GFcounty12 <- county_GFcount12[c(2:59), c(1,6,10,12)]
+GFcounty12
+
+SuspensionFemales12 <- sum(as.numeric(as.character(GFcounty12$totalsuspensions)))
+SuspensionFemales12
+```
+
+```{r}
+
+#extracts Black suspension
+RBcol2= which(Suspension12[,10] == "RB")
+length(RBcol2)
+RBcolrow2 <- Suspension12[RBcol2,]
+
+#Extracts American Indian or Alaska Native
+RIcol2= which(Suspension12[,10] == "RI")
+length(RIcol2)
+RIcolrow2 <- Suspension12[RIcol2,]
+
+
+#Extracts  Asian suspension
+RAcol2= which(Suspension12[,10] == "RA")
+length(RAcol2)
+RAcolrow2 <- Suspension12[RAcol2,]
+
+#Extracts Filipino suspension
+RFcol2= which(Suspension12[,10] == "RF")
+length(RFcol2)
+RFcolrow2 <- Suspension12[RFcol2,]
+
+#Extracts Hispanic/Latino
+RHcol2= which(Suspension12[,10] == "RH")
+length(RHcol2)
+RHcolrow2 <- Suspension12[RHcol2,]
+
+#Extracts Not reported
+RDcol2= which(Suspension12[,10] == "RD")
+length(RDcol2)
+RDcolrow2 <- Suspension12[RDcol2,]
+
+#Pacific Islanders
+RPcol2= which(Suspension12[,10] == "RP")
+length(RPcol2)
+RPcolrow2 <- Suspension12[RPcol2,]
+
+#Extracts 2+ races (mixed)
+RTcol2= which(Suspension12[,10] == "RT")
+length(RTcol2)
+RTcolrow2 <- Suspension12[RTcol2,]
+
+#Extracts white
+RWcol2= which(Suspension12[,10] == "RW")
+length(RWcol2)
+RWcolrow2 <- Suspension12[RWcol2,]
+
+#Extracts English Learners
+SEcol2= which(Suspension12[,10] == "SE")
+length(SEcol2)
+SEcolrow2 <- Suspension12[SEcol2,]
+
+
+#Extracts the rows of Totals for each county; TA stands for Total Suspensions
+
+county_count2 <- filter(Suspension12, Suspension12$reportingcategory =="TA")
+county_count2
+```
+
+2013-2014
+
+```{r}
+Suspension13 <- read.csv("suspension2013-14.csv", header = T)
+
+
+# Col 1 - Schools 
+length(unique(Suspension13$districtcode))
+# Finding how many unique elements are in the column districtcode- returns 
+length((Suspension13$districtcode)) # checking the length of the original column 
+
+length(unique(Suspension13$schoolcode))
+#now we do the same for all 20 columns  
+
+# Col 2 - ethnicities 
+length(unique(Suspension13$reportingcategory)) # returns 9 
+
+# Col 3 - gender 
+#length(unique(elevendata$GENDER)) # 2 
+
+#sum(Suspension1$V10 
+sum(as.numeric(Suspension13$cumulativeenrollment)) 
+sum(as.numeric(Suspension13$totalsuspensions))
+sum(as.numeric(Suspension13$unduplicatedcountofstudentssuspe)) 
+sum(as.numeric(Suspension13$V14)) 
+sum(as.numeric(Suspension13$suspensionratetotal)) 
+sum(as.numeric(Suspension13$suspensioncountviolentincidentin)) 
+sum(as.numeric(Suspension13$suspensioncountviolentincidentno)) 
+u <- sum(as.numeric(Suspension13$suspensioncountweaponspossession)) 
+p <- sum(as.numeric(Suspension13$suspensioncountillicitdrugrelate))  
+sum(as.numeric(Suspension13$suspensioncountofstudentssuspend))  
+sum(as.numeric(Suspension13$suspensioncountotherreasons))  
+sum(as.numeric(Suspension13$errataflagyn))
+
+#extracts male suspension
+GMcol3<- which(Suspension13[,10] == "GM")
+length(GMcol3)
+GMcolrow3 <- Suspension13[GMcol3,]
+
+#extracts female suspension
+GFcol3= which(Suspension13[,10] == "GF")
+length(GFcol3)
+GFcolrow <- Suspension13[GFcol3,]
+
+```
+
+```{r}
+
+county_GMcount13 <- filter(Suspension13, Suspension13$reportingcategory =="GM")
+
+county_GFcount13 <- filter(Suspension13, Suspension13$reportingcategory =="GF")
+
+#county_count <- filter(Suspension11, Suspension11$reportingcategory =="TA" && Suspension11$aggregatelevel == "c" && Suspension11$totalsuspensions)
+
+GMcounty13 <- county_GMcount13[c(2:59), c(1,6,10,12)]
+GMcounty13
+
+SuspensionMales13 <- sum(as.numeric(as.character(GMcounty13$totalsuspensions)))
+SuspensionMales13
+
+GFcounty13 <- county_GFcount13[c(2:59), c(1,6,10,12)]
+GFcounty13
+
+SuspensionFemales13 <- sum(as.numeric(as.character(GFcounty13$totalsuspensions)))
+SuspensionFemales13
+
+```
+
+```{r}
+#extracts Black suspension
+RBcol3= which(Suspension13[,10] == "RB")
+length(RBcol3)
+RBcolrow3 <- Suspension13[RBcol3,]
+
+#Extracts American Indian or Alaska Native
+RIcol3= which(Suspension13[,10] == "RI")
+length(RIcol3)
+RIcolrow3 <- Suspension11[RIcol3,]
+
+#Extracts  Asian suspension
+RAcol3= which(Suspension13[,10] == "RA")
+length(RAcol3)
+RAcolrow3 <- Suspension13[RAco3,]
+
+#Extracts Filipino suspension
+RFcol3= which(Suspension13[,10] == "RF")
+length(RFcol3)
+RFcolrow3 <- Suspension13[RFco3,]
+
+#Extracts Hispanic/Latino
+RHcol3= which(Suspension13[,10] == "RH")
+length(RHcol3)
+RHcolrow3 <- Suspension13[RHcol3,]
+
+#Extracts Not reported
+RDcol3= which(Suspension13[,10] == "RD")
+length(RDcol3)
+RDcolrow3 <- Suspension13[RDcol3,]
+
+#Pacific Islanders
+RPcol3= which(Suspension13[,10] == "RP")
+length(RPcol3)
+RPcolrow3 <- Suspension13[RPcol3,]
+
+#Extracts 2+ races (mixed)
+RTcol3= which(Suspension13[,10] == "RT")
+length(RTcol3)
+RTcolrow3 <- Suspension13[RTcol3,]
+
+#Extracts white
+RWcol3= which(Suspension13[,10] == "RW")
+length(RWcol3)
+RWcolrow3 <- Suspension13[RWcol3,]
+
+#Extracts English Learners
+SEcol3= which(Suspension13[,10] == "SE")
+length(SEcol3)
+SEcolrow3 <- Suspension13[SEcol3,]
+
+county_count3 <- filter(Suspension13, Suspension13$reportingcategory =="TA")
+county_count3
+```
+
+2014-2015
+```{r}
+Suspension14 <- read.csv("suspension2014-15.csv", header = T)
+
+# Col 1 - Schools 
+length(unique(Suspension14$districtcode))
+# Finding how many unique elements are in the column districtcode- returns 
+length((Suspension14$districtcode)) # checking the length of the original column 
+
+length(unique(Suspension14$schoolcode))
+#now we do the same for all 20 columns  
+
+# Col 2 - ethnicities 
+length(unique(Suspension14$reportingcategory)) # returns 9 
+
+# Col 3 - gender 
+#length(unique(elevendata$GENDER)) # 2 
+
+#sum(Suspension1$V10 
+sum(as.numeric(Suspension14$cumulativeenrollment)) 
+sum(as.numeric(Suspension14$totalsuspensions))
+sum(as.numeric(Suspension14$unduplicatedcountofstudentssuspe)) 
+sum(as.numeric(Suspension14$V14)) 
+sum(as.numeric(Suspension14$suspensionratetotal)) 
+sum(as.numeric(Suspension14$suspensioncountviolentincidentin)) 
+sum(as.numeric(Suspension14$suspensioncountviolentincidentno)) 
+v <- sum(as.numeric(Suspension14$suspensioncountweaponspossession)) 
+q <- sum(as.numeric(Suspension14$suspensioncountillicitdrugrelate))  
+sum(as.numeric(Suspension14$suspensioncountofstudentssuspend))  
+sum(as.numeric(Suspension14$suspensioncountotherreasons))  
+sum(as.numeric(Suspension14$errataflagyn))
+
+#extracts male suspension
+GMcol4<- which(Suspension14[,10] == "GM")
+length(GMcol4)
+GMcolrow4 <- Suspension14[GMcol4,]
+
+#extracts female suspension
+GFcol4= which(Suspension14[,10] == "GF")
+length(GFcol4)
+GFcolrow4 <- Suspension14[GFcol4,]
+```
+
+```{r}
+county_GMcount14 <- filter(Suspension14, Suspension14$reportingcategory =="GM")
+
+county_GFcount14 <- filter(Suspension14, Suspension14$reportingcategory =="GF")
+
+#county_count <- filter(Suspension11, Suspension11$reportingcategory =="TA" && Suspension11$aggregatelevel == "c" && Suspension11$totalsuspensions)
+
+GMcounty14 <- county_GMcount14[c(2:59), c(1,6,10,12)]
+GMcounty14
+
+SuspensionMales14 <- sum(as.numeric(as.character(GMcounty14$totalsuspensions)))
+SuspensionMales14
+
+GFcounty14 <- county_GFcount14[c(2:59), c(1,6,10,12)]
+GFcounty14
+
+SuspensionFemales14 <- sum(as.numeric(as.character(GFcounty14$totalsuspensions)))
+SuspensionFemales14
+
+```
+
+```{r}
+
+#extracts Black suspension
+RBcol4= which(Suspension14[,10] == "RB")
+length(RBcol4)
+RBcolrow4 <- Suspension14[RBcol4,]
+
+#Extracts American Indian or Alaska Native
+RIcol4= which(Suspension14[,10] == "RI")
+length(RIcol4)
+RIcolrow4 <- Suspension14[RIcol4,]
+
+
+#Extracts  Asian suspension
+RAcol4= which(Suspension14[,10] == "RA")
+length(RAcol4)
+RAcolrow4 <- Suspension14[RAcol4,]
+
+#Extracts Filipino suspension
+RFcol4= which(Suspension14[,10] == "RF")
+length(RFcol4)
+RFcolrow4 <- Suspension14[RFcol4,]
+
+#Extracts Hispanic/Latino
+RHcol4= which(Suspension14[,10] == "RH")
+length(RHcol4)
+RHcolrow4 <- Suspension14[RHcol4,]
+
+#Extracts Not reported
+RDcol4= which(Suspension14[,10] == "RD")
+length(RDcol4)
+RDcolrow4 <- Suspension14[RDcol4,]
+
+#Pacific Islanders
+RPcol4= which(Suspension14[,10] == "RP")
+length(RPcol4)
+RPcolrow4 <- Suspension14[RPco4,]
+
+#Extracts 2+ races (mixed)
+RTcol4= which(Suspension14[,10] == "RT")
+length(RTcol4)
+RTcolrow4 <- Suspension14[RTcol4,]
+
+#Extracts white
+RWcol4= which(Suspension14[,10] == "RW")
+length(RWcol4)
+RWcolrow4 <- Suspension14[RWcol4,]
+
+#Extracts English Learners
+SEcol4= which(Suspension14[,10] == "SE")
+length(SEcol4)
+SEcolrow4 <- Suspension14[SEcol4,]
+
+county_count4 <- filter(Suspension14, Suspension14$reportingcategory =="TA")
+county_count4
+```
+
+2015-2016
+```{r}
+
+Suspension15 <- read.csv("suspension2015-16.csv", header = T)
+
+# Col 1 - Schools 
+length(unique(Suspension15$districtcode))
+# Finding how many unique elements are in the column districtcode- returns 
+length((Suspension15$districtcode)) # checking the length of the original column 
+
+length(unique(Suspension15$schoolcode))
+#now we do the same for all 20 columns  
+
+# Col 2 - ethnicities 
+length(unique(Suspension15$reportingcategory)) # returns 9 
+
+# Col 3 - gender 
+#length(unique(elevendata$GENDER)) # 2 
+
+#sum(Suspension1$V10 
+sum(as.numeric(Suspension15$cumulativeenrollment)) 
+sum(as.numeric(Suspension15$totalsuspensions))
+sum(as.numeric(Suspension15$unduplicatedcountofstudentssuspe)) 
+sum(as.numeric(Suspension15$V14)) 
+sum(as.numeric(Suspension15$suspensionratetotal)) 
+sum(as.numeric(Suspension15$suspensioncountviolentincidentin)) 
+sum(as.numeric(Suspension15$suspensioncountviolentincidentno)) 
+w <- sum(as.numeric(Suspension15$suspensioncountweaponspossession)) 
+m <- sum(as.numeric(Suspension15$suspensioncountillicitdrugrelate))  
+sum(as.numeric(Suspension15$suspensioncountofstudentssuspend))  
+sum(as.numeric(Suspension15$suspensioncountotherreasons))  
+sum(as.numeric(Suspension15$errataflagyn))
+```
+
+```{r}
+
+#extracts male suspension
+GMcol5<- which(Suspension15[,10] == "GM")
+length(GMcol5)
+GMcolrow5 <- Suspension15[GMcol5,]
+
+#extracts female suspension
+GFcol5= which(Suspension15[,10] == "GF")
+length(GFcol5)
+GFcolrow5 <- Suspension15[GFcol5,]
+
+county_GMcount15 <- filter(Suspension15, Suspension15$reportingcategory =="GM")
+
+county_GFcount15 <- filter(Suspension15, Suspension15$reportingcategory =="GF")
+
+#county_count <- filter(Suspension11, Suspension11$reportingcategory =="TA" && Suspension11$aggregatelevel == "c" && Suspension11$totalsuspensions)
+
+GMcounty15 <- county_GMcount15[c(2:59), c(1,6,10,12)]
+GMcounty15
+
+SuspensionMales15 <- sum(as.numeric(as.character(GMcounty15$totalsuspensions)))
+SuspensionMales15
+
+GFcounty15 <- county_GFcount15[c(2:59), c(1,6,10,12)]
+GFcounty15
+
+SuspensionFemales15 <- sum(as.numeric(as.character(GFcounty15$totalsuspensions)))
+SuspensionFemales15
+
+
+```
+
+```{r}
+#extracts Black suspension
+RBcol5= which(Suspension15[,10] == "RB")
+length(RBcol5)
+RBcolrow5 <- Suspension15[RBcol5,]
+
+#Extracts American Indian or Alaska Native
+RIcol5= which(Suspension15[,10] == "RI")
+length(RIcol5)
+RIcolrow5 <- Suspension15[RIcol5,]
+
+
+#Extracts  Asian suspension
+RAcol5= which(Suspension15[,10] == "RA")
+length(RAcol5)
+RAcolrow5 <- Suspension15[RAcol5,]
+
+#Extracts Filipino suspension
+RFcol5= which(Suspension15[,10] == "RF")
+length(RFcol5)
+RFcolrow5 <- Suspension15[RFcol5,]
+
+#Extracts Hispanic/Latino
+RHcol5= which(Suspension15[,10] == "RH")
+length(RHcol5)
+RHcolrow5 <- Suspension15[RHcol5,]
+
+#Extracts Not reported
+RDcol5= which(Suspension15[,10] == "RD")
+length(RDcol5)
+RDcolrow5 <- Suspension15[RDcol5,]
+
+#Pacific Islanders
+RPcol5= which(Suspension15[,10] == "RP")
+length(RPcol5)
+RPcolrow5 <- Suspension15[RPcol5,]
+
+#Extracts 2+ races (mixed)
+RTcol5= which(Suspension15[,10] == "RT")
+length(RTcol5)
+RTcolrow5 <- Suspension15[RTcol5,]
+
+#Extracts white
+RWcol5= which(Suspension15[,10] == "RW")
+length(RWcol5)
+RWcolrow5 <- Suspension15[RWcol5,]
+
+#Extracts English Learners
+SEcol5= which(Suspension15[,10] == "SE")
+length(SEcol5)
+SEcolrow <- Suspension15[SEcol5,]
+
+county_count5 <- filter(Suspension15, Suspension15$reportingcategory =="TA")
+county_count5
+```
+
+2016-2017
+
+```{r}
+
+Suspension16 <- read.csv("suspension2016-17.csv", header = T)
+
+
+# Col 1 - Schools 
+length(unique(Suspension16$districtcode))
+# Finding how many unique elements are in the column districtcode- returns 
+length((Suspension16$districtcode)) # checking the length of the original column 
+
+length(unique(Suspension16$schoolcode))
+#now we do the same for all 20 columns  
+
+# Col 2 - ethnicities 
+length(unique(Suspension16$reportingcategory)) # returns 9 
+
+# Col 3 - gender 
+#length(unique(elevendata$GENDER)) # 2 
+
+#sum(Suspension1$V10 
+sum(as.numeric(Suspension16$cumulativeenrollment)) 
+sum(as.numeric(Suspension16$totalsuspensions))
+sum(as.numeric(Suspension16$unduplicatedcountofstudentssuspe)) 
+sum(as.numeric(Suspension16$V14)) 
+sum(as.numeric(Suspension16$suspensionratetotal)) 
+sum(as.numeric(Suspension16$suspensioncountviolentincidentin)) 
+sum(as.numeric(Suspension16$suspensioncountviolentincidentno)) 
+z <- sum(as.numeric(Suspension16$suspensioncountweaponspossession)) 
+n <- sum(as.numeric(Suspension16$suspensioncountillicitdrugrelate))  
+sum(as.numeric(Suspension16$suspensioncountofstudentssuspend))  
+sum(as.numeric(Suspension16$suspensioncountotherreasons))  
+sum(as.numeric(Suspension16$errataflagyn))
+```
+
+```{r}
+#extracts male suspension
+GMcol6<- which(Suspension16[,10] == "GM")
+length(GMcol6)
+GMcolrow6 <- Suspension11[GMcol6,]
+
+#extracts female suspension
+GFcol6= which(Suspension16[,10] == "GF")
+length(GFcol6)
+GFcolrow6 <- Suspension16[GFcol6,]
+
+county_GMcount16 <- filter(Suspension16, Suspension16$reportingcategory =="GM")
+
+county_GFcount16 <- filter(Suspension16, Suspension16$reportingcategory =="GF")
+
+#county_count <- filter(Suspension11, Suspension11$reportingcategory =="TA" && Suspension11$aggregatelevel == "c" && Suspension11$totalsuspensions)
+
+GMcounty16 <- county_GMcount16[c(2:59), c(1,6,10,12)]
+GMcounty16
+
+SuspensionMales16 <- sum(as.numeric(as.character(GMcounty16$totalsuspensions)))
+SuspensionMales16
+
+GFcounty16 <- county_GFcount16[c(2:59), c(1,6,10,12)]
+GFcounty16
+
+SuspensionFemales16 <- sum(as.numeric(as.character(GFcounty16$totalsuspensions)))
+SuspensionFemales16
+
+
+```
+
+```{r}
+
+#extracts Black suspension
+RBcol6= which(Suspension16[,10] == "RB")
+length(RBcol6)
+RBcolrow6 <- Suspension16[RBcol6,]
+
+#Extracts American Indian or Alaska Native
+RIcol6= which(Suspension16[,10] == "RI")
+length(RIcol6)
+RIcolrow6 <- Suspension16[RIcol6,]
+
+
+#Extracts  Asian suspension
+RAcol6= which(Suspension16[,10] == "RA")
+length(RAcol6)
+RAcolrow6 <- Suspension16[RAcol6,]
+
+#Extracts Filipino suspension
+RFcol6= which(Suspension16[,10] == "RF")
+length(RFcol6)
+RFcolrow6 <- Suspension16[RFcol6,]
+
+#Extracts Hispanic/Latino
+RHcol6= which(Suspension16[,10] == "RH")
+length(RHcol6)
+RHcolrow6 <- Suspension16[RHcol6,]
+
+#Extracts Not reported
+RDcol6= which(Suspension16[,10] == "RD")
+length(RDcol6)
+RDcolrow6 <- Suspension16[RDcol6,]
+
+#Pacific Islanders
+RPcol6= which(Suspension16[,10] == "RP")
+length(RPcol6)
+RPcolrow6 <- Suspension16[RPcol6,]
+
+#Extracts 2+ races (mixed)
+RTcol6= which(Suspension16[,10] == "RT")
+length(RTcol6)
+RTcolrow6 <- Suspension16[RTcol6,]
+
+#Extracts white
+RWcol6= which(Suspension16[,10] == "RW")
+length(RWcol6)
+RWcolrow6 <- Suspension16[RWcol6,]
+
+#Extracts English Learners
+SEcol6= which(Suspension16[,10] == "SE")
+length(SEcol6)
+SEcolrow6 <- Suspension16[SEcol6,]
+
+county_count6 <- filter(Suspension16, Suspension16$reportingcategory =="TA")
+county_count6
+```
+
+```{r}
+Female <-c(SuspensionFemales11, SuspensionFemales12, SuspensionFemales13, SuspensionFemales14, SuspensionFemales15, SuspensionFemales16)
+
+Male <- c(SuspensionMales11, SuspensionMales12, SuspensionMales13, SuspensionMales14, SuspensionMales15, SuspensionMales16)
+
+Years <- c(2011:2016)
+
+FemTot <- data.frame(Years, Female)
+names(FemTot) <- c("Years","Total")
+FemTot$Gender <- "Female"
+
+MaleTot <- data.frame(Years, Male)
+names(MaleTot) <- c("Years", "Total")
+MaleTot$Gender <- "Male"
+
+GenTot <- rbind(FemTot, MaleTot)
+
+GenTot$Years[GenTot$Years == 2011] <- "2011-12"
+GenTot$Years[GenTot$Years == 2012] <- "2012-13"
+GenTot$Years[GenTot$Years == 2013] <- "2013-14"
+GenTot$Years[GenTot$Years == 2014] <- "2014-15"
+GenTot$Years[GenTot$Years == 2015] <- "2015-16"
+GenTot$Years[GenTot$Years == 2016] <- "2016-17"
+
+
+GenTot <- GenTot[c(3,1,2)]
+
+Genderinfo <- aggregate(.~Years+Gender, data=GenTot, sum)
+options(scipen = 999)
+library(ggplot2)
+library(scales)
+
+GenderPlot <- ggplot(Genderinfo, aes(Years, Total)) + labs(title= "Yearly Suspension Counts in California K-12 Schools", subtitle = "By Gender") + geom_bar(aes(fill = Gender), stat="identity") + theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5))  + scale_y_continuous(limits=c(0,750000), breaks = seq(0,750000,75000), labels = comma)
+
+GenderPlot
+
+```
+
+```{r}
+maleodd <- filter(Suspension16, Suspension16$aggregatelevel=="C", Suspension16$reportingcategory=="GM" )
+
+susmal <- sum(as.numeric(maleodd$reportingcategory))
+
+
+#gets total female suspensions
+femsus <- sum(as.numeric(completeMerge$Female.Suspensions))
+femsus
+#
+enfem <- sum(as.numeric(completeMerge$en_female))
+enfem
+
+enmale <- sum(as.numeric(completeMerge$en_male))
+enmale
+
+femnot <- enfem-femsus
+femnot
+
+malenot <- enmale-malesus
+malenot
+
+suspmf <- matrix(c(malesus,malenot,femsus,femnot),nrow=2,byrow=TRUE)
+colnames(suspmf) <- c("Total Suspended","Total Not Suspended")
+rownames(suspmf) <- c("Males","Female")
+print(suspmf)
+
+oddgensus <- oddsratio(suspmf)
+oddgensus
+```
+
+
+```{r}
+getwd() #gets working directory
+```

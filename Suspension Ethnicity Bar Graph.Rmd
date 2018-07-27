@@ -1,0 +1,948 @@
+---
+title: "bargraphsfordataed"
+author: "Nathalie Huerta"
+date: "7/17/2018"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#Sky helped me to run code 
+library(dplyr)
+Suspension11 <- read.csv(file = "Suspension2011-12.csv", header = T) #imports the data 
+#this is the data for 2012-2013
+Suspension12 <- read.csv(file= "Suspension2012-13.csv", header = T) #imports the data 
+#this is the data for 2013-14
+Suspension13 <- read.csv(file= "Suspension2013-14.csv", header = T) #imports the data 
+#this is the data for 2014-2015
+Suspension14 <- read.csv(file= "Suspension2014-15.csv", header = T) #imports the data 
+#this is the data for 2016-2017
+Suspension15 <- read.csv(file= "Suspension2015-16.csv", header = T)
+Suspension16 <- read.csv(file= "Suspension2016-17.csv", header = T) #imports the data 
+```
+
+#Steps to Build the bar graph for Gender 
+# ```{r}
+# county_GMcount11 <- filter(Suspension11, Suspension11$reportingcategory =="GM")
+# 
+# county_GFcount11 <- filter(Suspension11, Suspension11$reportingcategory =="GF")
+# 
+# GMcounty11 <- county_GMcount11[c(2:59), c(1,6,10,12)]
+# GMcounty11
+# 
+# SuspensionMales11 <- sum(as.numeric(as.character(GMcounty11$totalsuspensions)))
+# SuspensionMales11
+# 
+# GFcounty11 <- county_GFcount11[c(2:59), c(1,6,10,12)]
+# GFcounty11
+# 
+# SuspensionFemales11 <- sum(as.numeric(as.character(GFcounty11$totalsuspensions)))
+# SuspensionFemales11
+# 
+# #---------------------------------------------------------------------------------------------------
+# 
+# county_GMcount12 <- filter(Suspension12, Suspension12$reportingcategory =="GM")
+# 
+# county_GFcount12 <- filter(Suspension12, Suspension12$reportingcategory =="GF")
+# 
+# GMcounty12 <- county_GMcount11[c(2:59), c(1,6,10,12)]
+# GMcounty12
+# 
+# SuspensionMales12 <- sum(as.numeric(as.character(GMcounty12$totalsuspensions)))
+# SuspensionMales12
+# 
+# GFcounty12 <- county_GFcount12[c(2:59), c(1,6,10,12)]
+# GFcounty12
+# 
+# SuspensionFemales12 <- sum(as.numeric(as.character(GFcounty12$totalsuspensions)))
+# SuspensionFemales12
+# 
+# #---------------------------------------------------------------------------------------------------
+# 
+# county_GMcount13 <- filter(Suspension13, Suspension13$reportingcategory =="GM")
+# 
+# county_GFcount13 <- filter(Suspension13, Suspension13$reportingcategory =="GF")
+# 
+# GMcounty13 <- county_GMcount13[c(2:59), c(1,6,10,12)]
+# GMcounty13
+# 
+# SuspensionMales13 <- sum(as.numeric(as.character(GMcounty13$totalsuspensions)))
+# SuspensionMales13
+# 
+# GFcounty13 <- county_GFcount13[c(2:59), c(1,6,10,12)]
+# GFcounty13
+# 
+# SuspensionFemales13 <- sum(as.numeric(as.character(GFcounty13$totalsuspensions)))
+# SuspensionFemales13
+# 
+# #---------------------------------------------------------------------------------------------------
+# 
+# county_GMcount14 <- filter(Suspension14, Suspension14$reportingcategory =="GM")
+# 
+# county_GFcount14 <- filter(Suspension14, Suspension14$reportingcategory =="GF")
+# 
+# GMcounty14 <- county_GMcount14[c(2:59), c(1,6,10,12)]
+# GMcounty14
+# 
+# SuspensionMales14 <- sum(as.numeric(as.character(GMcounty14$totalsuspensions)))
+# SuspensionMales14
+# 
+# GFcounty14 <- county_GFcount14[c(2:59), c(1,6,10,12)]
+# GFcounty14
+# 
+# SuspensionFemales14 <- sum(as.numeric(as.character(GFcounty14$totalsuspensions)))
+# SuspensionFemales14
+# 
+# #-------------------------------------------------------------------------------------------------
+# 
+# county_GMcount15 <- filter(Suspension15, Suspension15$reportingcategory =="GM")
+# 
+# county_GFcount15 <- filter(Suspension15, Suspension15$reportingcategory =="GF")
+# 
+# GMcounty15 <- county_GMcount15[c(2:59), c(1,6,10,12)]
+# GMcounty15
+# 
+# SuspensionMales15 <- sum(as.numeric(as.character(GMcounty15$totalsuspensions)))
+# SuspensionMales15
+# 
+# GFcounty15 <- county_GFcount15[c(2:59), c(1,6,10,12)]
+# GFcounty15
+# 
+# SuspensionFemales15 <- sum(as.numeric(as.character(GFcounty15$totalsuspensions)))
+# SuspensionFemales15
+# 
+# #--------------------------------------------------------------------------------------------
+# 
+# county_GMcount16 <- filter(Suspension16, Suspension16$reportingcategory =="GM")
+# 
+# county_GFcount16 <- filter(Suspension16, Suspension16$reportingcategory =="GF")
+# 
+# GMcounty16 <- county_GMcount16[c(2:59), c(1,6,10,12)]
+# GMcounty16
+# 
+# SuspensionMales16 <- sum(as.numeric(as.character(GMcounty16$totalsuspensions)))
+# SuspensionMales16
+# 
+# GFcounty16 <- county_GFcount16[c(2:59), c(1,6,10,12)]
+# GFcounty16
+# 
+# SuspensionFemales16 <- sum(as.numeric(as.character(GFcounty16$totalsuspensions)))
+# SuspensionFemales16
+# ```
+# 
+# ```{r}
+# #install.packages("scales")
+# library(scales)
+# library(ggplot2)
+# Female <-c(SuspensionFemales11, SuspensionFemales12, SuspensionFemales13, SuspensionFemales14, SuspensionFemales15, SuspensionFemales16)
+# 
+# Male <- c(SuspensionMales11, SuspensionMales12, SuspensionMales13, SuspensionMales14, SuspensionMales15, SuspensionMales16)
+# 
+# Years <- c(2011:2016)
+# 
+# FemTot <- data.frame(Years, Female)
+# names(FemTot) <- c("Years","Total")
+# FemTot$Gender <- "Female"
+# 
+# MaleTot <- data.frame(Years, Male)
+# names(MaleTot) <- c("Years", "Total")
+# MaleTot$Gender <- "Male"
+# 
+# GenTot <- rbind(FemTot, MaleTot)
+# 
+# GenTot$Years[GenTot$Years == 2011] <- "2011-12"
+# GenTot$Years[GenTot$Years == 2012] <- "2012-13"
+# GenTot$Years[GenTot$Years == 2013] <- "2013-14"
+# GenTot$Years[GenTot$Years == 2014] <- "2014-15"
+# GenTot$Years[GenTot$Years == 2015] <- "2015-16"
+# GenTot$Years[GenTot$Years == 2016] <- "2016-17"
+# 
+# GenTot <- GenTot[c(3,1,2)]
+# 
+# Genderinfo <- aggregate(.~Years+Gender, data=GenTot, sum)
+# options(scipen = 999)
+# 
+# GenderPlot <- ggplot(Genderinfo, aes(Years,Total)) + labs(title= "California Yearly Suspensions in K-12", subtitle = "By Gender") + geom_bar(aes(fill = Gender),stat="identity") + theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5)) + scale_y_continuous(limits=c(0,10000), breaks = seq(0,10000,1000), labels = comma)
+# GenderPlot
+
+
+
+#Steps to build bar graph for ethnicity
+```{r}
+#BLACK
+county_RBcount11 <- filter(Suspension11, Suspension11$reportingcategory =="RB")
+
+RBcounty11 <- county_RBcount11[c(2:59), c(1,6,10,12)]
+RBcounty11
+
+RBcounty11$totalsuspensions <- as.numeric(as.character(RBcounty11$totalsuspensions))
+RBcounty11$totalsuspensions[is.na(RBcounty11$totalsuspensions)] <- 0
+
+SuspensionRB11 <- sum(as.numeric(as.character(RBcounty11$totalsuspensions)))
+SuspensionRB11
+
+#---------------------------------------------------------------------------------------------------
+
+#American Indian
+county_RIcount11 <- filter(Suspension11, Suspension11$reportingcategory =="RI")
+RIcounty11 <- county_RIcount11[c(2:59), c(1,6,10,12)]
+RIcounty11
+
+RIcounty11$totalsuspensions <- as.numeric(as.character(RIcounty11$totalsuspensions))
+RIcounty11$totalsuspensions[is.na(RIcounty11$totalsuspensions)] <- 0
+
+SuspensionRI11 <- sum(as.numeric(as.character(RIcounty11$totalsuspensions)))
+SuspensionRI11
+
+#---------------------------------------------------------------------------------------------------
+
+#Asian 
+county_RAcount11 <- filter(Suspension11, Suspension11$reportingcategory =="RA")
+RAcounty11 <- county_RAcount11[c(2:59), c(1,6,10,12)]
+RAcounty11
+
+RAcounty11$totalsuspensions <- as.numeric(as.character(RAcounty11$totalsuspensions))
+RAcounty11$totalsuspensions[is.na(RAcounty11$totalsuspensions)] <- 0
+
+SuspensionRA11 <- sum(as.numeric(as.character(RAcounty11$totalsuspensions)))
+SuspensionRA11
+
+#---------------------------------------------------------------------------------------------------
+
+#Flipino
+county_RFcount11 <- filter(Suspension11, Suspension11$reportingcategory =="RF")
+RFcounty11 <- county_RFcount11[c(2:59), c(1,6,10,12)]
+RFcounty11
+
+RFcounty11$totalsuspensions <- as.numeric(as.character(RFcounty11$totalsuspensions))
+RFcounty11$totalsuspensions[is.na(RFcounty11$totalsuspensions)] <- 0
+
+SuspensionRF11 <- sum(as.numeric(as.character(RFcounty11$totalsuspensions)))
+SuspensionRF11
+
+#---------------------------------------------------------------------------------------------------
+
+#Hispanic 
+county_RHcount11 <- filter(Suspension11, Suspension11$reportingcategory =="RH")
+RHcounty11 <- county_RHcount11[c(2:59), c(1,6,10,12)]
+RHcounty11
+
+RHcounty11$totalsuspensions <- as.numeric(as.character(RHcounty11$totalsuspensions))
+RHcounty11$totalsuspensions[is.na(RHcounty11$totalsuspensions)] <- 0
+
+SuspensionRH11 <- sum(as.numeric(as.character(RHcounty11$totalsuspensions)))
+SuspensionRH11
+
+#--------------------------------------------------------------------------------------------------
+
+#Pacific Islander
+county_RPcount11 <- filter(Suspension11, Suspension11$reportingcategory =="RP")
+RPcounty11 <- county_RPcount11[c(2:59), c(1,6,10,12)]
+RPcounty11
+
+RPcounty11$totalsuspensions <- as.numeric(as.character(RPcounty11$totalsuspensions))
+RPcounty11$totalsuspensions[is.na(RPcounty11$totalsuspensions)] <- 0
+
+SuspensionRP11 <- sum(as.numeric(as.character(RPcounty11$totalsuspensions)))
+SuspensionRP11
+
+#------------------------------------------------------------------------------------------------
+
+#Two or More Races 
+county_RTcount11 <- filter(Suspension11, Suspension11$reportingcategory =="RT")
+RTcounty11 <- county_RTcount11[c(2:59), c(1,6,10,12)]
+RTcounty11
+
+RTcounty11$totalsuspensions <- as.numeric(as.character(RTcounty11$totalsuspensions))
+RTcounty11$totalsuspensions[is.na(RTcounty11$totalsuspensions)] <- 0
+
+SuspensionRT11 <- sum(as.numeric(as.character(RTcounty11$totalsuspensions)))
+SuspensionRT11
+
+#-------------------------------------------------------------------------------------------------
+
+#White 
+county_RWcount11 <- filter(Suspension11, Suspension11$reportingcategory =="RW")
+RWcounty11 <- county_RWcount11[c(2:59), c(1,6,10,12)]
+RWcounty11
+
+SuspensionRW11 <- sum(as.numeric(as.character(RWcounty11$totalsuspensions)))
+SuspensionRW11
+
+#-------------------------------------------------------------------------------------------------
+#NOT REPORTED 
+county_RDcount11 <- filter(Suspension11, Suspension11$reportingcategory =="RD")
+RDcounty11 <- county_RDcount12[c(2:59), c(1,6,10,12)]
+RDcounty11
+
+RDcounty11$totalsuspensions <- as.numeric(as.character(RDcounty11$totalsuspensions))
+RDcounty11$totalsuspensions[is.na(RDcounty11$totalsuspensions)] <- 0
+
+
+SuspensionRD11 <- sum(as.numeric(as.character(RDcounty11$totalsuspensions)))
+SuspensionRD11
+
+
+#-----------------------------------------------------------------------------------------------
+
+#BLACK
+county_RBcount12 <- filter(Suspension12, Suspension12$reportingcategory =="RB")
+
+RBcounty12 <- county_RBcount12[c(2:59), c(1,6,10,12)]
+RBcounty12
+
+RBcounty12$totalsuspensions <- as.numeric(as.character(RBcounty12$totalsuspensions))
+RBcounty12$totalsuspensions[is.na(RBcounty12$totalsuspensions)] <- 0
+
+SuspensionRB12 <- sum(as.numeric(as.character(RBcounty12$totalsuspensions)))
+SuspensionRB12
+
+#---------------------------------------------------------------------------------------------------
+
+#American Indian
+county_RIcount12 <- filter(Suspension12, Suspension12$reportingcategory =="RI")
+RIcounty12 <- county_RIcount12[c(2:59), c(1,6,10,12)]
+RIcounty12
+
+RIcounty12$totalsuspensions <- as.numeric(as.character(RIcounty12$totalsuspensions))
+RIcounty12$totalsuspensions[is.na(RIcounty12$totalsuspensions)] <- 0
+
+SuspensionRI12 <- sum(as.numeric(as.character(RIcounty12$totalsuspensions)))
+SuspensionRI12
+
+#---------------------------------------------------------------------------------------------------
+
+#Asian 
+county_RAcount12 <- filter(Suspension12, Suspension12$reportingcategory =="RA")
+RAcounty12 <- county_RAcount12[c(2:59), c(1,6,10,12)]
+RAcounty12
+
+RAcounty12$totalsuspensions <- as.numeric(as.character(RAcounty12$totalsuspensions))
+RAcounty12$totalsuspensions[is.na(RAcounty12$totalsuspensions)] <- 0
+
+SuspensionRA12 <- sum(as.numeric(as.character(RAcounty12$totalsuspensions)))
+SuspensionRA12
+
+#---------------------------------------------------------------------------------------------------
+
+#Flipino
+county_RFcount12 <- filter(Suspension12, Suspension12$reportingcategory =="RF")
+RFcounty12 <- county_RFcount12[c(2:59), c(1,6,10,12)]
+RFcounty12
+
+RFcounty12$totalsuspensions <- as.numeric(as.character(RFcounty12$totalsuspensions))
+RFcounty12$totalsuspensions[is.na(RFcounty12$totalsuspensions)] <- 0
+
+SuspensionRF12 <- sum(as.numeric(as.character(RFcounty12$totalsuspensions)))
+SuspensionRF12
+
+#---------------------------------------------------------------------------------------------------
+
+#Hispanic 
+county_RHcount12 <- filter(Suspension12, Suspension12$reportingcategory =="RH")
+RHcounty12 <- county_RHcount12[c(2:59), c(1,6,10,12)]
+RHcounty12
+
+SuspensionRH12 <- sum(as.numeric(as.character(RHcounty12$totalsuspensions)))
+SuspensionRH12
+
+#--------------------------------------------------------------------------------------------------
+
+#Pacific Islander
+county_RPcount12 <- filter(Suspension12, Suspension12$reportingcategory =="RP")
+RPcounty12 <- county_RPcount12[c(2:59), c(1,6,10,12)]
+RPcounty12
+
+RPcounty12$totalsuspensions <- as.numeric(as.character(RPcounty12$totalsuspensions))
+RPcounty12$totalsuspensions[is.na(RPcounty12$totalsuspensions)] <- 0
+
+SuspensionRP12 <- sum(as.numeric(as.character(RPcounty12$totalsuspensions)))
+SuspensionRP12
+
+#------------------------------------------------------------------------------------------------
+
+#Two or More Races 
+county_RTcount12 <- filter(Suspension12, Suspension12$reportingcategory =="RT")
+RTcounty12 <- county_RTcount12[c(2:59), c(1,6,10,12)]
+RTcounty12
+
+RTcounty12$totalsuspensions <- as.numeric(as.character(RTcounty11$totalsuspensions))
+RTcounty12$totalsuspensions[is.na(RTcounty11$totalsuspensions)] <- 0
+
+SuspensionRT12 <- sum(as.numeric(as.character(RTcounty12$totalsuspensions)))
+SuspensionRT12
+
+#-------------------------------------------------------------------------------------------------
+
+#White 
+county_RWcount12 <- filter(Suspension12, Suspension12$reportingcategory =="RW")
+RWcounty12 <- county_RWcount12[c(2:59), c(1,6,10,12)]
+RWcounty12
+
+SuspensionRW12 <- sum(as.numeric(as.character(RWcounty12$totalsuspensions)))
+SuspensionRW12
+
+#-------------------------------------------------------------------------------------------------
+
+#NOT REPORTED 
+county_RDcount12 <- filter(Suspension12, Suspension12$reportingcategory =="RD")
+RDcounty12 <- county_RDcount12[c(2:59), c(1,6,10,12)]
+RDcounty12
+
+RDcounty12$totalsuspensions <- as.numeric(as.character(RDcounty12$totalsuspensions))
+RDcounty12$totalsuspensions[is.na(RDcounty12$totalsuspensions)] <- 0
+
+
+SuspensionRD12 <- sum(as.numeric(as.character(RDcounty12$totalsuspensions)))
+SuspensionRD12
+
+#-------------------------------------------------------------------------------------------------
+#BLACK
+county_RBcount13 <- filter(Suspension13, Suspension13$reportingcategory =="RB")
+
+RBcounty13 <- county_RBcount13[c(2:59), c(1,6,10,12)]
+RBcounty13
+
+RBcounty13$totalsuspensions <- as.numeric(as.character(RBcounty13$totalsuspensions))
+RBcounty13$totalsuspensions[is.na(RBcounty13$totalsuspensions)] <- 0
+
+SuspensionRB13 <- sum(as.numeric(as.character(RBcounty13$totalsuspensions)))
+SuspensionRB13
+
+#---------------------------------------------------------------------------------------------------
+
+#American Indian
+county_RIcount13 <- filter(Suspension13, Suspension13$reportingcategory =="RI")
+RIcounty13 <- county_RIcount13[c(2:59), c(1,6,10,12)]
+RIcounty13
+
+RIcounty13$totalsuspensions <- as.numeric(as.character(RIcounty13$totalsuspensions))
+RIcounty13$totalsuspensions[is.na(RIcounty13$totalsuspensions)] <- 0
+
+SuspensionRI13 <- sum(as.numeric(as.character(RIcounty13$totalsuspensions)))
+SuspensionRI13
+
+#---------------------------------------------------------------------------------------------------
+
+#Asian 
+county_RAcount13 <- filter(Suspension13, Suspension13$reportingcategory =="RA")
+RAcounty13 <- county_RAcount13[c(2:59), c(1,6,10,12)]
+RAcounty13
+
+RAcounty13$totalsuspensions <- as.numeric(as.character(RAcounty13$totalsuspensions))
+RAcounty13$totalsuspensions[is.na(RAcounty13$totalsuspensions)] <- 0
+
+SuspensionRA13 <- sum(as.numeric(as.character(RAcounty13$totalsuspensions)))
+SuspensionRA13
+
+#---------------------------------------------------------------------------------------------------
+
+#Flipino
+county_RFcount13 <- filter(Suspension13, Suspension13$reportingcategory =="RF")
+RFcounty13 <- county_RFcount13[c(2:59), c(1,6,10,12)]
+RFcounty13
+
+RFcounty13$totalsuspensions <- as.numeric(as.character(RFcounty13$totalsuspensions))
+RFcounty13$totalsuspensions[is.na(RFcounty13$totalsuspensions)] <- 0
+
+SuspensionRF13 <- sum(as.numeric(as.character(RFcounty13$totalsuspensions)))
+SuspensionRF13
+
+#---------------------------------------------------------------------------------------------------
+
+#Hispanic 
+county_RHcount13 <- filter(Suspension13, Suspension13$reportingcategory =="RH")
+RHcounty13 <- county_RHcount13[c(2:59), c(1,6,10,12)]
+RHcounty13
+
+RHcounty13$totalsuspensions <- as.numeric(as.character(RHcounty13$totalsuspensions))
+RHcounty13$totalsuspensions[is.na(RHcounty13$totalsuspensions)] <- 0
+
+SuspensionRH13 <- sum(as.numeric(as.character(RHcounty13$totalsuspensions)))
+SuspensionRH13
+
+#--------------------------------------------------------------------------------------------------
+
+#Pacific Islander
+county_RPcount13 <- filter(Suspension13, Suspension13$reportingcategory =="RP")
+RPcounty13 <- county_RPcount12[c(2:59), c(1,6,10,12)]
+RPcounty13
+
+RPcounty13$totalsuspensions <- as.numeric(as.character(RPcounty13$totalsuspensions))
+RPcounty13$totalsuspensions[is.na(RPcounty13$totalsuspensions)] <- 0
+
+SuspensionRP13 <- sum(as.numeric(as.character(RPcounty13$totalsuspensions)))
+SuspensionRP13
+
+#------------------------------------------------------------------------------------------------
+
+#Two or More Races 
+county_RTcount13 <- filter(Suspension13, Suspension13$reportingcategory =="RT")
+RTcounty13 <- county_RTcount13[c(2:59), c(1,6,10,12)]
+RTcounty13
+
+RTcounty13$totalsuspensions <- as.numeric(as.character(RTcounty13$totalsuspensions))
+RTcounty13$totalsuspensions[is.na(RTcounty13$totalsuspensions)] <- 0
+
+SuspensionRT13 <- sum(as.numeric(as.character(RTcounty13$totalsuspensions)))
+SuspensionRT13
+
+#-------------------------------------------------------------------------------------------------
+
+#White 
+county_RWcount13 <- filter(Suspension13, Suspension13$reportingcategory =="RW")
+RWcounty13 <- county_RWcount13[c(2:59), c(1,6,10,12)]
+RWcounty13
+
+SuspensionRW13 <- sum(as.numeric(as.character(RWcounty13$totalsuspensions)))
+SuspensionRW13
+
+#----------------------------------------------------------------------------------------------
+#NOT REPORTED 
+county_RDcount13 <- filter(Suspension13, Suspension13$reportingcategory =="RD")
+RDcounty13 <- county_RDcount13[c(2:59), c(1,6,10,12)]
+RDcounty13
+
+RDcounty13$totalsuspensions <- as.numeric(as.character(RDcounty13$totalsuspensions))
+RDcounty13$totalsuspensions[is.na(RDcounty13$totalsuspensions)] <- 0
+
+
+SuspensionRD13 <- sum(as.numeric(as.character(RDcounty13$totalsuspensions)))
+SuspensionRD13
+
+#----------------------------------------------------------------------------------------------
+#BLACK
+county_RBcount14 <- filter(Suspension14, Suspension14$reportingcategory =="RB")
+
+RBcounty14<- county_RBcount14[c(2:59), c(1,6,10,12)]
+RBcounty14
+
+RBcounty14$totalsuspensions <- as.numeric(as.character(RBcounty14$totalsuspensions))
+RBcounty14$totalsuspensions[is.na(RBcounty14$totalsuspensions)] <- 0
+
+SuspensionRB14 <- sum(as.numeric(as.character(RBcounty14$totalsuspensions)))
+SuspensionRB14
+
+#---------------------------------------------------------------------------------------------------
+
+#American Indian
+county_RIcount14 <- filter(Suspension14, Suspension14$reportingcategory =="RI")
+RIcounty14 <- county_RIcount14[c(2:59), c(1,6,10,12)]
+RIcounty14
+
+RIcounty14$totalsuspensions <- as.numeric(as.character(RIcounty14$totalsuspensions))
+RIcounty14$totalsuspensions[is.na(RIcounty14$totalsuspensions)] <- 0
+
+SuspensionRI14 <- sum(as.numeric(as.character(RIcounty14$totalsuspensions)))
+SuspensionRI14
+
+#---------------------------------------------------------------------------------------------------
+
+#Asian 
+county_RAcount14 <- filter(Suspension14, Suspension14$reportingcategory =="RA")
+RAcounty14 <- county_RAcount14[c(2:59), c(1,6,10,12)]
+RAcounty14
+
+RAcounty14$totalsuspensions <- as.numeric(as.character(RAcounty14$totalsuspensions))
+RAcounty14$totalsuspensions[is.na(RAcounty14$totalsuspensions)] <- 0
+
+SuspensionRA14 <- sum(as.numeric(as.character(RAcounty14$totalsuspensions)))
+SuspensionRA14
+
+#---------------------------------------------------------------------------------------------------
+
+#Flipino
+county_RFcount14 <- filter(Suspension14, Suspension14$reportingcategory =="RF")
+RFcounty14 <- county_RFcount14[c(2:59), c(1,6,10,12)]
+RFcounty14
+
+RFcounty14$totalsuspensions <- as.numeric(as.character(RFcounty14$totalsuspensions))
+RFcounty14$totalsuspensions[is.na(RFcounty14$totalsuspensions)] <- 0
+
+SuspensionRF14 <- sum(as.numeric(as.character(RFcounty14$totalsuspensions)))
+SuspensionRF14
+
+#---------------------------------------------------------------------------------------------------
+
+#Hispanic 
+county_RHcount14 <- filter(Suspension14, Suspension14$reportingcategory =="RH")
+RHcounty14 <- county_RHcount14[c(2:59), c(1,6,10,12)]
+RHcounty14
+
+RHcounty14$totalsuspensions <- as.numeric(as.character(RHcounty14$totalsuspensions))
+RHcounty14$totalsuspensions[is.na(RHcounty14$totalsuspensions)] <- 0
+
+SuspensionRH14 <- sum(as.numeric(as.character(RHcounty14$totalsuspensions)))
+SuspensionRH14
+
+#--------------------------------------------------------------------------------------------------
+
+#Pacific Islander
+county_RPcount14 <- filter(Suspension14, Suspension14$reportingcategory =="RP")
+RPcounty14 <- county_RPcount12[c(2:59), c(1,6,10,12)]
+RPcounty14
+
+RPcounty14$totalsuspensions <- as.numeric(as.character(RPcounty14$totalsuspensions))
+RPcounty14$totalsuspensions[is.na(RPcounty14$totalsuspensions)] <- 0
+
+SuspensionRP14 <- sum(as.numeric(as.character(RPcounty14$totalsuspensions)))
+SuspensionRP14
+
+#------------------------------------------------------------------------------------------------
+
+#Two or More Races 
+county_RTcount14 <- filter(Suspension14, Suspension14$reportingcategory =="RT")
+RTcounty14 <- county_RTcount14[c(2:59), c(1,6,10,12)]
+RTcounty14
+
+RTcounty14$totalsuspensions <- as.numeric(as.character(RTcounty14$totalsuspensions))
+RTcounty14$totalsuspensions[is.na(RTcounty14$totalsuspensions)] <- 0
+
+SuspensionRT14 <- sum(as.numeric(as.character(RTcounty14$totalsuspensions)))
+SuspensionRT14
+
+#-------------------------------------------------------------------------------------------------
+
+#White 
+county_RWcount14 <- filter(Suspension14, Suspension14$reportingcategory =="RW")
+RWcounty14 <- county_RWcount14[c(2:59), c(1,6,10,12)]
+RWcounty14
+
+SuspensionRW14 <- sum(as.numeric(as.character(RWcounty14$totalsuspensions)))
+SuspensionRW14
+
+#------------------------------------------------------------------------------------------------
+
+#NOT REPORTED
+county_RDcount14 <- filter(Suspension14, Suspension14$reportingcategory =="RD")
+RDcounty14 <- county_RDcount14[c(2:59), c(1,6,10,12)]
+RDcounty14
+
+RDcounty14$totalsuspensions <- as.numeric(as.character(RDcounty14$totalsuspensions))
+RDcounty14$totalsuspensions[is.na(RDcounty14$totalsuspensions)] <- 0
+
+
+SuspensionRD14 <- sum(as.numeric(as.character(RDcounty14$totalsuspensions)))
+SuspensionRD14
+
+#--------------------------------------------------------------------------------------------------
+
+#BLACK
+county_RBcount15 <- filter(Suspension15, Suspension15$reportingcategory =="RB")
+
+RBcounty15<- county_RBcount15[c(2:59), c(1,6,10,12)]
+RBcounty15
+
+RBcounty15$totalsuspensions <- as.numeric(as.character(RBcounty15$totalsuspensions))
+RBcounty15$totalsuspensions[is.na(RBcounty15$totalsuspensions)] <- 0
+
+SuspensionRB15 <- sum(as.numeric(as.character(RBcounty15$totalsuspensions)))
+SuspensionRB15
+
+#---------------------------------------------------------------------------------------------------
+
+#American Indian
+county_RIcount15 <- filter(Suspension15, Suspension15$reportingcategory =="RI")
+RIcounty15 <- county_RIcount15[c(2:59), c(1,6,10,12)]
+RIcounty15
+
+RIcounty15$totalsuspensions <- as.numeric(as.character(RIcounty15$totalsuspensions))
+RIcounty15$totalsuspensions[is.na(RIcounty15$totalsuspensions)] <- 0
+
+SuspensionRI15 <- sum(as.numeric(as.character(RIcounty15$totalsuspensions)))
+SuspensionRI15
+
+#---------------------------------------------------------------------------------------------------
+
+#Asian 
+county_RAcount15 <- filter(Suspension15, Suspension15$reportingcategory =="RA")
+RAcounty15 <- county_RAcount15[c(2:59), c(1,6,10,12)]
+RAcounty15
+
+RAcounty15$totalsuspensions <- as.numeric(as.character(RAcounty15$totalsuspensions))
+RAcounty15$totalsuspensions[is.na(RAcounty15$totalsuspensions)] <- 0
+
+SuspensionRA15 <- sum(as.numeric(as.character(RAcounty15$totalsuspensions)))
+SuspensionRA15
+
+#---------------------------------------------------------------------------------------------------
+
+#Flipino
+county_RFcount15 <- filter(Suspension15, Suspension15$reportingcategory =="RF")
+RFcounty15 <- county_RFcount15[c(2:59), c(1,6,10,12)]
+RFcounty15
+
+RFcounty15$totalsuspensions <- as.numeric(as.character(RFcounty15$totalsuspensions))
+RFcounty15$totalsuspensions[is.na(RFcounty15$totalsuspensions)] <- 0
+
+SuspensionRF15 <- sum(as.numeric(as.character(RFcounty15$totalsuspensions)))
+SuspensionRF15
+
+#---------------------------------------------------------------------------------------------------
+
+#Hispanic 
+county_RHcount15 <- filter(Suspension15, Suspension15$reportingcategory =="RH")
+RHcounty15 <- county_RHcount15[c(2:59), c(1,6,10,12)]
+RHcounty15
+
+RHcounty15$totalsuspensions <- as.numeric(as.character(RHcounty15$totalsuspensions))
+RHcounty15$totalsuspensions[is.na(RHcounty15$totalsuspensions)] <- 0
+
+
+SuspensionRH15 <- sum(as.numeric(as.character(RHcounty15$totalsuspensions)))
+SuspensionRH15
+
+#--------------------------------------------------------------------------------------------------
+
+#Pacific Islander
+county_RPcount15 <- filter(Suspension15, Suspension15$reportingcategory =="RP")
+RPcounty15 <- county_RPcount15[c(2:59), c(1,6,10,12)]
+RPcounty15
+
+RPcounty15$totalsuspensions <- as.numeric(as.character(RPcounty15$totalsuspensions))
+RPcounty15$totalsuspensions[is.na(RPcounty15$totalsuspensions)] <- 0
+
+SuspensionRP15 <- sum(as.numeric(as.character(RPcounty15$totalsuspensions)))
+SuspensionRP15
+
+#------------------------------------------------------------------------------------------------
+
+#Two or More Races 
+county_RTcount15 <- filter(Suspension15, Suspension15$reportingcategory =="RT")
+RTcounty15 <- county_RTcount15[c(2:59), c(1,6,10,12)]
+RTcounty15
+
+RTcounty15$totalsuspensions <- as.numeric(as.character(RTcounty15$totalsuspensions))
+RTcounty15$totalsuspensions[is.na(RTcounty15$totalsuspensions)] <- 0
+
+SuspensionRT15 <- sum(as.numeric(as.character(RTcounty15$totalsuspensions)))
+SuspensionRT15
+
+#-------------------------------------------------------------------------------------------------
+
+#White 
+county_RWcount15 <- filter(Suspension15, Suspension15$reportingcategory =="RW")
+RWcounty15 <- county_RWcount15[c(2:59), c(1,6,10,12)]
+RWcounty15
+
+SuspensionRW15 <- sum(as.numeric(as.character(RWcounty15$totalsuspensions)))
+SuspensionRW15
+
+
+#----------------------------------------------------------------------------------------------
+#NOT REPORTED
+
+county_RDcount15 <- filter(Suspension15, Suspension15$reportingcategory =="RD")
+RDcounty15 <- county_RDcount15[c(2:59), c(1,6,10,12)]
+RDcounty15
+
+RDcounty15$totalsuspensions <- as.numeric(as.character(RDcounty15$totalsuspensions))
+RDcounty15$totalsuspensions[is.na(RDcounty15$totalsuspensions)] <- 0
+
+
+SuspensionRD15 <- sum(as.numeric(as.character(RDcounty15$totalsuspensions)))
+SuspensionRD15
+
+#-----------------------------------------------------------------------------------------------
+
+#BLACK
+county_RBcount16 <- filter(Suspension16, Suspension16$reportingcategory =="RB")
+
+RBcounty16<- county_RBcount16[c(2:59), c(1,6,10,12)]
+RBcounty16
+
+RBcounty16$totalsuspensions <- as.numeric(as.character(RBcounty16$totalsuspensions))
+RBcounty16$totalsuspensions[is.na(RBcounty16$totalsuspensions)] <- 0
+
+SuspensionRB16 <- sum(as.numeric(as.character(RBcounty16$totalsuspensions)))
+SuspensionRB16
+
+#---------------------------------------------------------------------------------------------------
+
+#American Indian
+county_RIcount16 <- filter(Suspension16, Suspension16$reportingcategory =="RI")
+RIcounty16 <- county_RIcount16[c(2:59), c(1,6,10,12)]
+RIcounty16
+
+RIcounty16$totalsuspensions <- as.numeric(as.character(RIcounty16$totalsuspensions))
+RIcounty16$totalsuspensions[is.na(RIcounty16$totalsuspensions)] <- 0
+
+SuspensionRI16 <- sum(as.numeric(as.character(RIcounty16$totalsuspensions)))
+SuspensionRI16
+
+#---------------------------------------------------------------------------------------------------
+
+#Asian 
+county_RAcount16 <- filter(Suspension16, Suspension16$reportingcategory =="RA")
+RAcounty16 <- county_RAcount16[c(2:59), c(1,6,10,12)]
+RAcounty16
+
+RAcounty16$totalsuspensions <- as.numeric(as.character(RAcounty16$totalsuspensions))
+RAcounty16$totalsuspensions[is.na(RAcounty16$totalsuspensions)] <- 0
+
+SuspensionRA16 <- sum(as.numeric(as.character(RAcounty16$totalsuspensions)))
+SuspensionRA16
+
+#---------------------------------------------------------------------------------------------------
+
+#Flipino
+county_RFcount16 <- filter(Suspension16, Suspension16$reportingcategory =="RF")
+RFcounty16 <- county_RFcount16[c(2:59), c(1,6,10,12)]
+RFcounty16
+
+RFcounty16$totalsuspensions <- as.numeric(as.character(RFcounty16$totalsuspensions))
+RFcounty16$totalsuspensions[is.na(RFcounty16$totalsuspensions)] <- 0
+
+SuspensionRF16 <- sum(as.numeric(as.character(RFcounty16$totalsuspensions)))
+SuspensionRF16
+
+#---------------------------------------------------------------------------------------------------
+
+#Hispanic 
+county_RHcount16 <- filter(Suspension16, Suspension16$reportingcategory =="RH")
+RHcounty16 <- county_RHcount16[c(2:59), c(1,6,10,12)]
+RHcounty16
+
+RHcounty16$totalsuspensions <- as.numeric(as.character(RHcounty16$totalsuspensions))
+RHcounty16$totalsuspensions[is.na(RHcounty16$totalsuspensions)] <- 0
+
+
+SuspensionRH16 <- sum(as.numeric(as.character(RHcounty16$totalsuspensions)))
+SuspensionRH16
+
+#--------------------------------------------------------------------------------------------------
+
+#Pacific Islander
+county_RPcount16 <- filter(Suspension16, Suspension16$reportingcategory =="RP")
+RPcounty16 <- county_RPcount16[c(2:59), c(1,6,10,12)]
+RPcounty16
+
+RPcounty16$totalsuspensions <- as.numeric(as.character(RPcounty16$totalsuspensions))
+RPcounty16$totalsuspensions[is.na(RPcounty16$totalsuspensions)] <- 0
+
+SuspensionRP16 <- sum(as.numeric(as.character(RPcounty16$totalsuspensions)))
+SuspensionRP16
+
+#------------------------------------------------------------------------------------------------
+
+#Two or More Races 
+county_RTcount16 <- filter(Suspension16, Suspension16$reportingcategory =="RT")
+RTcounty16 <- county_RTcount16[c(2:59), c(1,6,10,12)]
+RTcounty16
+
+RTcounty16$totalsuspensions <- as.numeric(as.character(RTcounty16$totalsuspensions))
+RTcounty16$totalsuspensions[is.na(RTcounty16$totalsuspensions)] <- 0
+
+SuspensionRT16 <- sum(as.numeric(as.character(RTcounty16$totalsuspensions)))
+SuspensionRT16
+
+#-------------------------------------------------------------------------------------------------
+
+#White 
+county_RWcount16 <- filter(Suspension16, Suspension16$reportingcategory =="RW")
+RWcounty16 <- county_RWcount16[c(2:59), c(1,6,10,12)]
+RWcounty16
+
+SuspensionRW16 <- sum(as.numeric(as.character(RWcounty16$totalsuspensions)))
+SuspensionRW16
+
+#-------------------------------------------------------------------------------------------------
+
+#not rported 
+county_RDcount16 <- filter(Suspension16, Suspension16$reportingcategory =="RD")
+RDcounty16 <- county_RDcount16[c(2:59), c(1,6,10,12)]
+RDcounty16
+
+RDcounty16$totalsuspensions <- as.numeric(as.character(RDcounty16$totalsuspensions))
+RDcounty16$totalsuspensions[is.na(RDcounty16$totalsuspensions)] <- 0
+
+
+SuspensionRD16 <- sum(as.numeric(as.character(RDcounty16$totalsuspensions)))
+SuspensionRD16
+
+```
+
+#Plotting the bar graphs for Ethnicity 
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(scales)
+RAethnicity  <-c(SuspensionRA11, SuspensionRA12,SuspensionRA13, SuspensionRA14, SuspensionRA15, SuspensionRA16)
+
+RBethnicity2  <-c(SuspensionRB11, SuspensionRB12,SuspensionRB13, SuspensionRB14, SuspensionRB15, SuspensionRB16)
+
+RHethnicity5  <-c(SuspensionRH11, SuspensionRH12,SuspensionRH13, SuspensionRH14, SuspensionRH15, SuspensionRH16)
+
+RWethnicity8  <-c(SuspensionRW11, SuspensionRW12,SuspensionRW13, SuspensionRW14, SuspensionRW15, SuspensionRW16)
+
+ROsum11  <-sum(SuspensionRF11, SuspensionRP11,SuspensionRT11,SuspensionRI11, SuspensionRD11)
+
+ROsum12  <-sum(SuspensionRF12, SuspensionRP12,SuspensionRT12,SuspensionRI12, SuspensionRD12)
+
+ROsum13  <-sum(SuspensionRF13, SuspensionRP13,SuspensionRT13,SuspensionRI13, SuspensionRD13)
+
+ROsum14 <- sum(SuspensionRF14, SuspensionRP14,SuspensionRT14,SuspensionRI14, SuspensionRD14)
+
+ROsum15 <- sum(SuspensionRF15, SuspensionRP15,SuspensionRT15,SuspensionRI15, SuspensionRD15)
+
+ROsum16 <- sum(SuspensionRF16, SuspensionRP16,SuspensionRT16,SuspensionRI16, SuspensionRD16)
+
+ROethnicity <- c(ROsum11,ROsum12,ROsum13,ROsum14,ROsum15,ROsum16)
+
+Years <- c(2011:2016)
+
+RATot <- data.frame(Years, RAethnicity)
+names(RATot) <- c("Years","Total")
+RATot$ethnicity <- "Asian"
+
+RBTot <- data.frame(Years, RBethnicity2)
+names(RBTot) <- c("Years","Total")
+RBTot$ethnicity <- "Black"
+
+RHTot <- data.frame(Years, RHethnicity5)
+names(RHTot) <- c("Years","Total")
+RHTot$ethnicity <- "Hispanic/Latinx"
+
+RWTot <- data.frame(Years, RWethnicity8)
+names(RWTot) <- c("Years","Total")
+RWTot$ethnicity <- "White"
+
+ROTot <- data.frame(Years, ROethnicity)
+names(ROTot) <- c("Years","Total")
+ROTot$ethnicity <- "Other"
+
+EthTot <- rbind(RATot, RBTot, RHTot,RWTot,ROTot )
+
+EthTot$Years[EthTot$Years == 2011] <- "2011-12"
+EthTot$Years[EthTot$Years == 2012] <- "2012-13"
+EthTot$Years[EthTot$Years == 2013] <- "2013-14"
+EthTot$Years[EthTot$Years == 2014] <- "2014-15"
+EthTot$Years[EthTot$Years == 2015] <- "2015-16"
+EthTot$Years[EthTot$Years == 2016] <- "2016-17"
+
+colnames(EthTot) <- c("Years", "Total", "Race_Ethnicity")
+
+Ethinfo <- aggregate(.~Years+Race_Ethnicity, data=EthTot, sum)
+options(scipen = 999)
+
+
+EthPlot <- ggplot(Ethinfo, aes(Years,Total)) + labs(title= "Yearly Suspension Counts in California K-12 Schools", subtitle = "By Race/Ethnicity", fill="Race/Ethnicity") + geom_bar(aes(fill = Race_Ethnicity),stat="identity") + theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = 0.5)) + scale_y_continuous(limits=c(0,750000), breaks = seq(0,750000,75000), labels = comma)
+
+EthPlot
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+

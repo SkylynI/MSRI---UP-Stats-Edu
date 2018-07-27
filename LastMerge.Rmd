@@ -1,0 +1,34 @@
+---
+title: "allMerge"
+author: "Skylyn Irby"
+date: "7/19/2018"
+output: html_document
+---
+
+```{r}
+SuspensionDemo <- read.csv(file = "Suspension_DEMO.csv", header = T)
+ExpulsionDemo <- read.csv(file = "Expulsion_DEMO.csv", header = T)
+DropoutDemo <- read.csv(file = "Do_demo.csv", header = T)
+
+StuffDemo <- read.csv(file = "en_cp_ucCsu_demo.csv", header = T)
+
+Sus_stuffdemo <- merge(StuffDemo, SuspensionDemo, by = c("dist_year"))
+write.csv(Sus_stuffdemo, file = "/Users/skylynolyviairby/Desktop/Edu Data Suspension/Sus_en_cp_ucCsu_DEMO.csv")
+
+Ex_stuffdemo <- merge(StuffDemo, ExpulsionDemo, by = c("dist_year"))
+write.csv(Sus_stuffdemo, file = "/Users/skylynolyviairby/Desktop/Edu Data Suspension/Ex_en_cp_ucCsu_DEMO.csv")
+
+DO_stuffdemo <- merge(StuffDemo, DropoutDemo, by = c("dist_year"))
+write.csv(DO_stuffdemo, file = "/Users/skylynolyviairby/Desktop/Edu Data Suspension/Do_en_cp_ucCsu_DEMO.csv")
+
+Sus_Ex_stuffdemo <- merge(Sus_stuffdemo, ExpulsionDemo, by = c("dist_year"))
+Sus_Ex_Do_stuffdemo <- merge(Sus_Ex_stuffdemo, DropoutDemo, by = c("dist_year"))
+
+Sus_Ex_Do_stuffdemo$do_total <- rowSums(Sus_Ex_Do_stuffdemo[,c("do_male", "do_female")])
+
+Sus_Ex_Do_stuffdemo<- Sus_Ex_Do_stuffdemo[,-c(2,22,31,40)]
+
+write.csv(Sus_Ex_Do_stuffdemo, file = "/Users/skylynolyviairby/Desktop/Edu Data Suspension/Sus_Ex_Do_en_cp_ucCsu_DEMO.csv")
+
+```
+

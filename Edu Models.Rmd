@@ -1,0 +1,294 @@
+---
+title: "Edu Models"
+author: "Skylyn Irby"
+date: "7/15/2018"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library("dplyr")
+library("fmsb")
+completeMerge<- read.csv("completeMerge.csv", header = T)
+# completeMerge$ucCsu_all <- completeMerge$ucCsu_female + completeMerge$ucCsu_male
+# completeMerge$do_all <- completeMerge$do_female + completeMerge$do_male
+# completeMerge$expulsion_all <- completeMerge$Expulsions_Females + completeMerge$Expulsions_Males
+# completeMerge$suspension_all <- completeMerge$Male.Suspensions + completeMerge$Female.Suspensions
+# completeMerge <- completeMerge[,-c(34,43:46)]
+# completeMerge$enroll_all<- completeMerge$enroll_tot
+# completeMerge <- completeMerge[,-c(1,2,42)]
+# write.csv(completeMerge, file = "/Users/skylynolyviairby/Desktop/Edu Data Suspension/completeMerge.csv")
+#-----------------------------------------------------------------------------------
+# Fit our regression model
+Model1 <- lm(ucCsu_all ~ do_all + expulsion_all + suspension_all + FreeReduced + Foster + EnglishLearner, # regression formula
+                  data=completeMerge) # data set
+
+Model1
+
+summary(Model1)
+
+confint(Model1, conf.level=.95)
+
+
+```
+$$UC Eligible Grads \approx 9.50325 + 0.08533 * X_1 + 9.51356 * X_2 + -0.15359 * X_3 + 0.02438 * X_4 + -0.27122 * X_5 + 0.03559 * X_6$$
+Where $$X_1 = Dropouts, X_2=Expulsions, X_3 =Suspensions, X_4= Free and Reduced Lunch, X_5=Foster, X_6=English Learner$$
+
+
+```{r}
+# Model2<- lm(ucCsu_all ~ do_all + expulsion_all + suspension_all + FreeReduced + Foster + EnglishLearner, # regression formula
+#                   data=completeMerge) # data set
+# 
+# Model2 <-  lm(ucCsu_all~., completeMerge)
+# 
+# summary(Model2)
+
+```
+
+```{r}
+#gets total male suspensions
+malesus <- sum(as.numeric(completeMerge$Male.Suspensions))
+malesus
+#gets total female suspensions
+femsus <- sum(as.numeric(completeMerge$Female.Suspensions))
+femsus
+#
+enfem <- sum(as.numeric(completeMerge$enroll_female))
+enfem
+
+enmale <- sum(as.numeric(completeMerge$enroll_male))
+enmale
+
+femnot <- enfem-femsus
+femnot
+
+malenot <- enmale-malesus
+malenot
+
+
+suspmf <- matrix(c(malesus,malenot,femsus,femnot),nrow=2,byrow=TRUE)
+colnames(suspmf) <- c("Total Suspended","Total Not Suspended")
+rownames(suspmf) <- c("Males","Female")
+print(suspmf)
+
+oddgensus <- oddsratio(suspmf)
+oddgensus
+```
+
+```{r}
+#_____________________________________________________________________________________________
+#black compared to white
+#gets total female suspensions
+bsus <- sum(as.numeric(completeMerge$BlackSuspensions))
+bsus
+
+wsus <- sum(as.numeric(completeMerge$WhiteSuspensoins))
+wsus
+
+#
+enblack <- sum(as.numeric(completeMerge$enroll_black))
+enblack
+
+enwhite <- sum(as.numeric(completeMerge$enroll_white))
+enwhite
+
+
+bnot <- enblack-bsus
+bnot
+
+wnot <- enwhite-wsus
+wnot
+
+suspbw <- matrix(c(bsus,bnot,wsus,wnot),nrow=2,byrow=TRUE)
+colnames(suspbw) <- c("Total Suspended","Total Not Suspended")
+rownames(suspbw) <- c("Black","White")
+print(suspbw)
+
+oddbwsus <- oddsratio(suspbw)
+oddbwsus
+```
+
+```{r}
+hsus<- sum(as.numeric(completeMerge$HispanicSuspensions))
+hsus
+
+wsus <- sum(as.numeric(completeMerge$WhiteSuspensoins))
+wsus
+
+enhisp <- sum(as.numeric(completeMerge$enroll_hisp))
+enhisp
+
+enwhite <- sum(as.numeric(completeMerge$enroll_white))
+enwhite
+
+hnot <- enhisp-hsus
+hnot
+
+wnot <- enwhite-wsus
+wnot
+
+susphw <- matrix(c(hsus,hnot,wsus,wnot),nrow=2,byrow=TRUE)
+colnames(susphw) <- c("Total Suspended","Total Not Suspended")
+rownames(susphw) <- c("Hispanic","White")
+print(susphw)
+
+oddhwsus <- oddsratio(susphw)
+oddhwsus
+```
+
+```{r}
+hsus<- sum(as.numeric(completeMerge$HispanicSuspensions))
+hsus
+
+bsus <- sum(as.numeric(completeMerge$BlackSuspensions))
+bsus
+
+enhisp <- sum(as.numeric(completeMerge$enroll_hisp))
+enhisp
+
+enblack <- sum(as.numeric(completeMerge$enroll_black))
+enblack
+
+hnot <- enhisp-hsus
+hnot
+
+bnot <- enblack-bsus
+bnot
+
+susphb <- matrix(c(hsus,hnot,bsus,bnot),nrow=2,byrow=TRUE)
+colnames(susphb) <- c("Total Suspended","Total Not Suspended")
+rownames(susphb) <- c("Hispanic","Black")
+print(susphb)
+
+oddhbsus <- oddsratio(susphb)
+oddhbsus
+```
+
+```{r}
+
+hsus<- sum(as.numeric(completeMerge$HispanicSuspensions))
+hsus
+
+asus <- sum(as.numeric(completeMerge$AsianSuspensions))
+asus
+
+enhisp <- sum(as.numeric(completeMerge$enroll_hisp))
+enhisp
+
+enasian <- sum(as.numeric(completeMerge$enroll_asian))
+enasian
+
+hnot <- enhisp-hsus
+hnot
+
+anot <- enasian-asus
+anot
+
+suspha <- matrix(c(hsus,hnot,asus,anot),nrow=2,byrow=TRUE)
+colnames(suspha) <- c("Total Suspended","Total Not Suspended")
+rownames(suspha) <- c("Hispanic","Asian")
+print(suspha)
+
+oddhasus <- oddsratio(suspha)
+oddhasus
+```
+
+```{r}
+asus <- sum(as.numeric(completeMerge$AsianSuspensions))
+asus
+
+bsus<- sum(as.numeric(completeMerge$BlackSuspensions))
+bsus
+
+enasian <- sum(as.numeric(completeMerge$enroll_asian))
+enasian
+
+enblack <- sum(as.numeric(completeMerge$enroll_black))
+enblack
+
+anot
+
+bnot
+
+suspab <- matrix(c(asus,anot,bsus,bnot),nrow=2,byrow=TRUE)
+colnames(suspab) <- c("Total Suspended","Total Not Suspended")
+rownames(suspab) <- c("Asian","Black")
+print(suspab)
+
+oddabsus <- oddsratio(suspab)
+oddabsus
+```
+
+```{r}
+suspah <- matrix(c(asus,anot,hsus,hnot),nrow=2,byrow=TRUE)
+colnames(suspah) <- c("Total Suspended","Total Not Suspended")
+rownames(suspah) <- c("Asian","Hispanic")
+print(suspah)
+
+oddahsus <- oddsratio(suspah)
+oddahsus
+```
+
+```{r}
+suspaw <- matrix(c(asus,anot,wsus,wnot),nrow=2,byrow=TRUE)
+colnames(suspaw) <- c("Total Suspended","Total Not Suspended")
+rownames(suspaw) <- c("Asian","White")
+print(suspaw)
+
+oddawsus <- oddsratio(suspaw)
+oddawsus
+```
+
+```{r}
+suspba <- matrix(c(bsus,bnot,asus,anot),nrow=2,byrow=TRUE)
+colnames(suspba) <- c("Total Suspended","Total Not Suspended")
+rownames(suspba) <- c("Black","Asian")
+print(suspba)
+
+oddbasus <- oddsratio(suspba)
+oddbasus
+```
+
+```{r}
+suspbh <- matrix(c(bsus,bnot,hsus,hnot),nrow=2,byrow=TRUE)
+colnames(suspbh) <- c("Total Suspended","Total Not Suspended")
+rownames(suspbh) <- c("Black","Hispanic")
+print(suspbh)
+
+oddbhsus <- oddsratio(suspbh)
+oddbhsus
+```
+
+```{r}
+suspwa <- matrix(c(wsus,wnot,asus,anot),nrow=2,byrow=TRUE)
+colnames(suspwa) <- c("Total Suspended","Total Not Suspended")
+rownames(suspwa) <- c("White","Asian")
+print(suspwa)
+
+oddwasus <- oddsratio(suspwa)
+oddwasus
+```
+
+```{r}
+suspwb <- matrix(c(wsus,wnot,bsus,bnot),nrow=2,byrow=TRUE)
+colnames(suspwb) <- c("Total Suspended","Total Not Suspended")
+rownames(suspwb) <- c("White","Black")
+print(suspwb)
+
+oddwbsus <- oddsratio(suspwb)
+oddwbsus
+```
+
+```{r}
+suspwh <- matrix(c(wsus,wnot,hsus,hnot),nrow=2,byrow=TRUE)
+colnames(suspwh) <- c("Total Suspended","Total Not Suspended")
+rownames(suspwh) <- c("White","Hispanic")
+print(suspwh)
+
+oddwhsus <- oddsratio(suspwh)
+oddwhsus
+```
+
+
+

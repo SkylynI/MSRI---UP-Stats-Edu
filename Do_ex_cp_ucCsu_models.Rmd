@@ -1,0 +1,108 @@
+---
+title: "do_ex_cp_ucCsu_models"
+author: "Skylyn Irby"
+date: "7/19/2018"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(dplyr)
+library(stargazer)
+library(readxl)
+library(ggplot2)
+library(GGally)
+library(MASS)
+library(corpcor)
+library(mctest)
+library(ppcor)
+library(BBmisc)
+
+
+do_encp<- read.csv("Do_en_cp_ucCsu_DEMO.csv", header = T)
+do_encp$do_all <- do_encp$do_male + do_encp$do_female
+do_encp <- do_encp[,-c(1,3,23)]
+do_encp <- as.integer(as.character(do_encp))
+do_encp <- na.omit(do_encp)
+
+#---------Model 1 Standardize Data---------
+DoModel1 <- do_encp[,-c(1)] #omit dist_year
+zdovalues <- scale(DoModel1, center = TRUE, scale = TRUE) # scaled data; standardized https://stat.ethz.ch/R-manual/R-devel/library/base/html/scale.html 
+nzdovalues <- normalize(zdovalues, method = 'range', range = c(0,1)) # norm data https://www.rdocumentation.org/packages/BBmisc/versions/1.10/topics/normalize
+
+donormdf <- as.data.frame(nzdovalues) # converting the standardized and normalized just values into a data frame 
+standnormDo_encp <- cbind(dist_year,donormdf) # standardized data frame with all the values and dist_year (as "factor")
+write.csv(standnormDo_encp, file="/Users/skylynolyviairby/Desktop/Edu Data Suspension/standnormDo_encp.csv")
+#-----------------Dropout Model 1---------------------
+DoModel1Stand <- lm(ucCsu_total ~  Doulsion_Total + FreeReduced + Foster + EnglishLearner, data= standnormDo_encp ,na.action=na.exclude)
+DoModel1Stand
+summary(DoModel1Stand)
+
+stargazer(DoModel1Stand, type="latex", 
+          dep.var.labels = c("UC/CSU Eligible Graduates"),covariate.labels = c("Doulsions","Free and Reduced Lunch" ,"Foster Youth","English Learners" ), single.row = T, report = ('vc*s*p'),out="modeloneNOCOLLIN.tex")
+
+
+
+
+
+
+#Remove FreeReduced 
+doModel11 <- lm(ucCsu_total ~ do_all + Foster + EnglishLearner, data=do_encp)
+doModel11
+summary(doModel11)
+
+stargazer(doModel11, type="latex", 
+          dep.var.labels = c("UC/CSU Eligible Graduates"),covariate.labels = c("Droupouts","Foster Youth","English Learners" ), single.row = T, report = ('vc*p*s'), out="modeloneNOCOLLIN.tex")
+#Removed English Learners
+doModel111 <- lm(ucCsu_total ~ do_all + Foster + FreeReduced, data=do_encp)
+doModel111
+summary(doModel111)
+stargazer(doModel111, type="latex", 
+          dep.var.labels = c("UC/CSU Eligible Graduates"),covariate.labels = c("Dropouts","Foster Youth","Free and Reduced Lunch"), single.row = T, report = ('vc*p*s'), out="modeloneNOCOLLIN.tex")
+```
+
+
+```{r}
+# ---------------- Second Model --------------------
+doModel2 <- do_encp[,-c(1,12:18)] # removing the Uc/Csu demograhic variables because they are the dependent variable
+
+# Make every column numeric that is not already 
+doModel2$do_asian <- as.numeric(as.character(doModel2$do_asian))
+doModel2$do_black <- as.numeric(as.character(doModel2$do_black))
+doModel2 <- doModel2[,-c(13)] # removing "county" column 
+
+dopredictorModel2 <- lm(ucCsu_total~., doModel2)
+dopredictorModel2 
+
+stargazer(AllColPredictorModel2, type="latex", dep.var.labels = c("UC/CSU Eligible Graduates"), covariate.labels = c("Enrolled (Asian)", "Enrolled (Black)","Enrolled (Hispanic)","Enrolled (White)","Enrolled (Other)", "Enrolled (Female)","Enrolled (male)","English Learners","Free or Reduced Lunch","Foster Youth","Enrolled","do (male)","do (Female)","do (Asian)","do (Black)","do (Hispanic)","do (White)","do"),report = ('vc*p*s'), out="modeltwo.tex")
+```
+
+```{r}
+#-----------------Models using Relative DF------------
+relativeDDF <- read.csv(file="relativeCompleteMerge.csv", header = T)
+
+#------------------------Relative Exppension Model 1---------------------
+relativeDo1 <- lm(ucCsu_totalrel ~  do_totalrel + EnglishLearnerrel + Fosterrel , data= relativeDDF)
+relativeDo1
+summary(relativeDo1)
+#R^2 = .093
+stargazer(relativeDo1, type="latex", dep.var.labels = c("UC/CSU Eligible Graduates"), covariate.labels = c("Dropouts","English Learners","Foster Youth"),report = ('vc*p*s'), out="modeltwo.tex")
+
+#------------------Relative Expulsion Model 1: Ehtnicity------------
+relativeDoEth<- lm(ucCsu_totalrel~ do_asianrel + do_blackrel + do_hisprel + do_whiterel + do_otherrel + EnglishLearnerrel + Fosterrel, data = relativeDDF)
+relativeDoEth
+summary(relativeDoEth)
+#R^2 = 0.1885
+
+stargazer(relativeDoEth, type="latex", dep.var.labels = c("UC/CSU Eligible Graduates"), covariate.labels = c("Dropouts (Asian)","Dropouts (Black)", "Dropouts (Hispanic)", "Dropouts (White)", "Dropouts (Other)","English Learners","Foster Youth"),report = ('vc*p*s'), out="modeltwo.tex")
+
+#----------------Relative Expulsion Model 1: Gender---------------------
+relativeDoGen <- lm(ucCsu_totalrel~  do_malerel + do_femalerel + EnglishLearnerrel + Fosterrel, data = relativeDDF)
+relativeDoGen
+summary(relativeDoGen)
+#R^2 = 0.08051
+stargazer(relativeDoGen, type="latex", dep.var.labels = c("UC/CSU Eligible Graduates"), covariate.labels = c("Dropouts (Male)", "Dropouts (Female)","English Learners","Foster Youth"),report = ('vc*p*s'), out="modeltwo.tex")
+```
+
+

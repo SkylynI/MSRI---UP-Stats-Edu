@@ -1,0 +1,226 @@
+---
+title: "Ex_en_cp_ucCsu_models"
+author: "Skylyn Irby"
+date: "7/19/2018"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(dplyr)
+library(stargazer)
+library(readxl)
+library(ggplot2)
+library(GGally)
+library(MASS)
+library(corpcor)
+library(mctest)
+library(ppcor)
+library(BBmisc)
+Exp_encp<- read.csv("Ex_en_cp_ucCsu_DEMO.csv", header = T)
+#Exp_encp$Expulsion_Total <- Exp_encp$Expulsions_Male + Exp_encp$Expulsions_Females
+Exp_encp <- Exp_encp[,-c(1,3,23)]
+Exp_encp <- na.omit(Exp_encp)
+
+dist_year <-as.character(Exp_encp$dist_year) 
+expvalues <- Exp_encp[,-c(1)] #identical df sans dist_year 
+# let's take off dist year, so this coonstant variable is not manipulated in anyway; we will append it after manipulating the variable values
+
+expvalues$Expulsion_Asian <- as.numeric(as.character(expvalues$Expulsion_Asian))
+expvalues$Expulsion_Black <- as.numeric(as.character(expvalues$Expulsion_Black))
+
+
+zexpvalues <- scale(expvalues, center = TRUE, scale = TRUE) # scaled data; standardized https://stat.ethz.ch/R-manual/R-devel/library/base/html/scale.html 
+nzexpvalues <- normalize(zexpvalues, method = 'range', range = c(0,1)) # norm data https://www.rdocumentation.org/packages/BBmisc/versions/1.10/topics/normalize
+
+expnormdf <- as.data.frame(nzexpvalues) # converting the standardized and normalized just values into a data frame 
+standnormExp_encp <- cbind(dist_year,expnormdf) # standardized data frame with all the values and dist_year (as "factor")
+write.csv(standnormExp_encp, file="/Users/skylynolyviairby/Desktop/Edu Data Exppension/standnormExp_encp.csv")
+
+#---------------Exp Model 1 with Standardized Data-------------
+ExpModel1Stand <- lm(ucCsu_total ~  Expulsion_Total + FreeReduced + Foster + EnglishLearner, data= standnormExp_encp ,na.action=na.exclude)
+ExpModel1Stand
+summary(ExpModel1Stand)
+
+stargazer(ExpModel1Stand, type="latex", 
+          dep.var.labels = c("UC/CSU Eligible Graduates"),covariate.labels = c("Expulsions","Free and Reduced Lunch" ,"Foster Youth","English Learners" ), single.row = T, report = ('vc*s*p'),out="modeloneNOCOLLIN.tex")
+
+#--------------Expp Model 1 Stand. Check for Colinearity-------------------
+ExpMod1standCo<- standnormExp_encp[,c(9:11,21:28)] #check for colinearity from the stand. data frame
+ggpairs(ExpMod1standCo)
+
+cor2pcor(cov(ExpMod1standCo))
+
+# now, Farrar – Glauber Test
+omcdiag(x= ExpMod1standCo, y=standnormExp_encp$ucCsu_total)
+
+
+imcdiag(ExpMod1standCo,standnormExp_encp$ucCsu_total)
+
+# Now, we're going to conduct a t-test for correlation coefficient 
+pcor(Mod1stand, method = "pearson")
+
+#-------------MODEL 1 Remove FreeReduced ________ after Colinearity-------------
+ExpModel11 <- lm(ucCsu_total ~ Expulsion_Total + Foster + EnglishLearner, data=standnormExp_encp)
+ExpModel11
+summary(ExpModel11)
+
+stargazer(ExpModel11, type="latex", 
+          dep.var.labels = c("UC/CSU Eligible Graduates"),covariate.labels = c("Expulsions","Foster Youth","English Learners" ), single.row = T, report = ('vc*p*s'),out="modeloneNOCOLLIN.tex")
+
+#-------------MODEL 1 Remove English Learners ________ after Colinearity-------------
+ExpModel111 <- lm(ucCsu_total ~ Expulsion_Total + Foster + FreeReduced, data=standnormExp_encp)
+ExpModel111
+summary(ExpModel11)
+
+stargazer(ExpModel111, type="latex", 
+          dep.var.labels = c("UC/CSU Eligible Graduates"),covariate.labels = c("Expulsions","Foster Youth","Free and Reduced Lunch" ), single.row = T, report = ('vc*p*s'),out="modeloneNOCOLLIN.tex")
+
+# ---------------- Standardizing data for Model 2--------------------
+
+Exo_encp2 <- Exp_encp[,-c(1,12:18)] # removing the Uc/Csu demograhic variables because they are the dependent variable
+
+# Make every column numeric that is not already 
+# Exo_encp2$Expulsion_Asian <- as.numeric(as.character(Exo_encp2$Expulison_Asian))
+# Exo_encp2$Expulsion_Black <- as.numeric(as.character(Exo_encp2$Expulsion_Black))
+
+zexp2values <- scale(Exo_encp2, center = TRUE, scale = TRUE) # scaled data; standardized https://stat.ethz.ch/R-manual/R-devel/library/base/html/scale.html 
+nzexp2values <- normalize(zexp2values, method = 'range', range = c(0,1)) # norm data https://www.rdocumentation.org/packages/BBmisc/versions/1.10/topics/normalize
+
+expnormdf2 <- as.data.frame(nzexp2values) # converting the standardized and normalized just values into a data frame 
+standnormExo_encp2 <- cbind(dist_year,expnormdf2) # data frame with all the values and dist_year (as "factor")
+write.csv(standnormExo_encp2, file="/Users/skylynolyviairby/Desktop/Edu Data Exppension/standnormExo_encp2.csv")
+
+#------------------Model 2 Standardized : GENDER -----------------
+
+standnormExo_encp2 <- standnormExo_encp2[,-c(1)] #get rid of dist_year
+ExModel2 <- lm(ucCsu_total~EnglishLearner + FreeReduced + Foster + Expulsion_Male + Expulsion_Female, data=standnormExo_encp2, na.action=na.exclude)
+ExModel2
+summary(ExModel2)
+
+stargazer(ExModel2, type="latex", dep.var.labels = c("UC/CSU Eligible Graduates"), covariate.labels = c("Enrolled (Asian)", "Enrolled (Black)","Enrolled (Hispanic)","Enrolled (White)","Enrolled (Other)", "Enrolled (Female)","Enrolled (Male)","English Learners","Free or Reduced Lunch","Foster Youth","Enrolled","Exppensions (Male)","Exppensions (Female)","Exppensions (Asian)","Exppensions (Black)","Exppensions (Hispanic)","Exppensions (White)","OtherExppensions", "Exppenions"),report = ('vc*p*s'), out="modeltwo.tex")
+
+
+#-------------------Model 2 Check for colinearity LATER -----------------
+Mod2stand<- standnormExo_encp2[,c(1:20)] #check for colinearity from the stand. data frame
+ggpairs(Mod2stand)
+
+cor2pcor(cov(Mod2stand))
+
+# now, Farrar – Glauber Test
+omcdiag(x= Mod2stand, y=standnormExo_encp2$ucCsu_total)
+
+imcdiag(Mod2stand,standnormExo_encp2$ucCsu_total)
+
+# Now, we're going to conduct a t-test for correlation coefficient 
+pcor(Mod2stand, method = "pearson")
+
+#---------------Model 2 Gender-----------------
+# standnormExo_encp2 <- standnormExo_encp2[,-c(1)] #get rid of dist_year
+# AllColPredictorModel2Stand <- lm(ucCsu_total~., standnormExo_encp2, na.action=na.exclude)
+# AllColPredictorModel2Stand
+# summary(AllColPredictorModel2Stand)
+# 
+# stargazer(AllColPredictorModel2Stand, type="latex", dep.var.labels = c("UC/CSU Eligible Graduates"), covariate.labels = c("Enrolled (Asian)", "Enrolled (Black)","Enrolled (Hispanic)","Enrolled (White)","Enrolled (Other)", "Enrolled (Female)","Enrolled (Male)","English Learners","Free or Reduced Lunch","Foster Youth","Enrolled","Exppensions (Male)","Exppensions (Female)","Exppensions (Asian)","Exppensions (Black)","Exppensions (Hispanic)","Exppensions (White)","OtherExppensions", "Exppenions"),report = ('vc*p*s'), out="modeltwo.tex")
+
+
+
+#Let's explore Colinearity
+
+#Hlavac, Marek (2018). stargazer: Well-Formatted Regression and Summary Statistics Tables 
+#R package version 5.2.2. https://CRAN.R-project.org/package=stargazer 
+
+#below, indicate columns for the variables in the model
+Z <- Exp_encp[,c(9:11,20,28)]
+ggpairs(Z)
+
+cor2pcor(cov(Z))
+# Since the correlation matrix shows that the pair-wise correlation among all the explanatory variables are not very high, except for the pair english learners-Free Reduced Lunch. 
+
+# now, Farrar – Glauber Test
+omcdiag(x= Z, y=Exp_encp$ucCsu_total)
+# the value of the standardized determinant is found to be 0.0037 which is very small which indicates a strong degree of multicollinearity and the calculated value of the Chi-square test statistic is 677.0182 which is pretty significant which all indicates multicollinearity in the model 
+# [understanding the standardized determinant] The stronger the departure from the orthogonality (or the closer the value of the standardized determinant to zero), the stronger the degree of multicollinearity and vice versa.
+
+
+# This induces us to go for the next step of Farrar – Glauber test (F – test) for the location of the multicollinearity.
+
+imcdiag(Z,Exp_encp$ucCsu_total)
+
+# The VIF, TOL and Wi columns provide the diagnostic output for variance inflation factor, tolerance and Farrar-Glauber F-test respectively.
+# English Learners, Free/Reduced Lunch, Foster Youth, and Expulsion totals all have pretty high F-Statistics, the strongest being Free/Reduced Lunch
+
+
+# Now, we're going to conduct a t-test for correlation coefficient 
+pcor(Z, method = "pearson")
+# high partial correlation between: Free Reduced Lunch & English Learners, Lunch & Foster youth, Foster Youth & Expulsions total  
+
+# To fix the issue, we will remove any variable with a VIF value larger than 10. in this case, there is only one: Free or Reduced lunch 
+
+#Remove FreeReduced 
+ExpModel11 <- lm(ucCsu_total ~ Expulsion_Total + Foster + EnglishLearner, data=Exp_encp)
+ExpModel11
+summary(ExpModel11)
+
+stargazer(ExpModel11, type="latex", 
+          dep.var.labels = c("UC/CSU Eligible Graduates"),covariate.labels = c("Expulsions","Foster Youth","English Learners" ), single.row = T, report = ('vc*p*s'), out="modeloneNOCOLLIN.tex")
+#Removed English Learners
+ExpModel111 <- lm(ucCsu_total ~ Expulsion_Total + Foster + FreeReduced, data=Exp_encp)
+ExpModel111
+summary(ExpModel111)
+stargazer(ExpModel111, type="latex", 
+          dep.var.labels = c("UC/CSU Eligible Graduates"),covariate.labels = c("Expulsions","Foster Youth","Free and Reduced Lunch"), single.row = T, report = ('vc*p*s'), out="modeloneNOCOLLIN.tex")
+```
+
+
+```{r}
+# ---------------- Second Model --------------------
+ExpModel2 <- Exp_encp[,-c(1,12:18)] # removing the Uc/Csu demograhic variables because they are the dependent variable
+
+# Make every column numeric that is not already 
+# ExpModel2$Expulsion_Asian <- as.numeric(as.character(ExpModel2$Expulsion_Asian))
+# ExpModel2$Expulsion_Black <- as.numeric(as.character(ExpModel2$Expulsion_Black))
+#ExpModel2 <- ExpModel2[,-c(13)] # removing "county" column 
+
+ExPredictorModel2 <- lm(ucCsu_total~., data=ExpModel2)
+ExPredictorModel2 
+
+stargazer(ExPredictorModel2, type="latex", dep.var.labels = c("UC/CSU Eligible Graduates"), covariate.labels = c("Enrolled (Asian)", "Enrolled (Black)","Enrolled (Hispanic)","Enrolled (White)","Enrolled (Other)", "Enrolled (Female)","Enrolled (Male)","English Learners","Free or Reduced Lunch","Foster Youth","Enrolled", "Exppensions (Male)","Exppensions (Female)","Exppensions (Asian)","Exppensions (Black)","Exppensions (Hispanic)","Exppensions (White)","OtherExppensions", "Exppenions"),report = ('vc*p*s'), out="modeltwo.tex",report = ('vc*p*s'), out="modeltwo.tex")
+
+#----------Model 2 by Gender---------
+
+ExModel2Gen<- lm(ucCsu_total~  EnglishLearner + FreeReduced + Foster + MaleExppensions + FemaleExppensions, standnormExp_encp2)
+ExpModel2Gen
+summary(ExpModel2Gen)
+
+stargazer(ExpModel2Gen, type="latex", dep.var.labels = c("UC/CSU Eligible Graduates"), covariate.labels = c("English Learners","Free or Reduced Lunch","Foster Youth","Exppensions (Male)","Exppensions (Female)"),report = ('vc*p*s'), out="modeltwo.tex")
+
+```
+
+```{r}
+#-----------------Models using Relative DF------------
+relativeEDF <- read.csv(file="relativeCompleteMerge.csv", header = T)
+
+#------------------------Relative Exppension Model 1---------------------
+relativeExp1 <- lm(ucCsu_totalrel ~  Expulsion_Totalrel + EnglishLearnerrel + Fosterrel , data= relativeEDF)
+relativeExp1
+summary(relativeExp1)
+#R^2 = .093
+stargazer(relativeExp1, type="latex", dep.var.labels = c("UC/CSU Eligible Graduates"), covariate.labels = c("Expulsions","English Learners","Foster Youth"),report = ('vc*p*s'), out="modeltwo.tex")
+
+#------------------Relative Expulsion Model 1: Ehtnicity------------
+relativeExpEth<- lm(ucCsu_totalrel~ Expulsion_Asianrel + Expulsion_Blackrel + Expulsion_Hispanicrel + Expulsion_Whiterel + Expulsion_Otherrel  + EnglishLearnerrel + Fosterrel, data = relativeEDF)
+relativeExpEth
+summary(relativeExpEth)
+#R^2 = .062
+
+stargazer(relativeExpEth, type="latex", dep.var.labels = c("UC/CSU Eligible Graduates"), covariate.labels = c("Expulsions (Asian)","Expulsions (Black)", "Expulsions (Hispanic)", "Expulsions (White)", "Expulsions (Other)","English Learners","Foster Youth"),report = ('vc*p*s'), out="modeltwo.tex")
+
+#----------------Relative Expulsion Model 1: Gender---------------------
+relativeExpGen <- lm(ucCsu_totalrel~  Expulsion_Malerel + Expulsion_Femalerel  + EnglishLearnerrel + Fosterrel, data = relativeEDF)
+relativeExpGen
+summary(relativeExpGen)
+#R^2 = .0852
+stargazer(relativeExpGen, type="latex", dep.var.labels = c("UC/CSU Eligible Graduates"), covariate.labels = c("Expulsions (Male)", "Expulsions (Female)","English Learners","Foster Youth"),report = ('vc*p*s'), out="modeltwo.tex")
+```
